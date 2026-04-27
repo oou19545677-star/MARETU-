@@ -385,53 +385,98 @@ body {
         flex-direction: column;
     }
 
-    /* 游戏区域：占屏幕 60% 高度 */
+@media screen and (max-width: 900px) {
+    /* 主容器改为上下排列 */
+    #main-container {
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* 游戏区域：高度自适应内容，不再固定60vh */
     #game-area {
-        flex: 6; 
-        height: 60vh;
-        padding: 45px 10px 10px; /* 顶部留出给音量和计时器的空间 */
-        justify-content: center; /* 居中紧凑排列，防止元素被挤出屏幕 */
-        gap: 10px;
+        flex: 0 0 auto;
+        height: auto;
+        justify-content: flex-start;
+        padding: 10px 10px 5px 10px;
+        gap: 8px;
+        overflow-y: auto;
     }
 
-    /* 商店区域：占屏幕 40% 高度 */
+    /* 商店区域：占据剩余高度，可滚动 */
     #shop-area {
-        flex: 4; 
-        height: 40vh;
-        max-height: 40vh;
+        flex: 1 1 auto;
+        height: auto;
+        min-height: 30%;
         border-left: none;
-        border-top: 2px solid #2c2c2c; /* 分割线移到顶部 */
+        border-top: 2px solid #2c2c2c;
         padding: 10px;
+        overflow-y: auto;
     }
 
-    /* 地鼠网格：动态计算宽度，防止在小屏幕上高度超出 */
+    /* 调整各个元素紧凑排列 */
+    #top-ui {
+        margin-bottom: 0;
+    }
+
+    #timer-display {
+        order: 0;
+        margin: 0 auto;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        background: rgba(0,0,0,0.5);
+        padding: 4px 12px;
+        border-radius: 20px;
+        align-self: center;
+        visibility: visible !important;
+    }
+
+    #score-display {
+        order: 0;
+        margin: 5px 0;
+        font-size: 22px;
+    }
+
     #grid {
+        order: 0;
         gap: 6px;
         padding: 10px;
         width: 100%;
-        /* 关键：限制最大宽度为屏幕高度的 40%，使得网格按比例缩小时永远不会超出屏幕高度 */
-        max-width: min(100%, 40vh); 
+        max-width: min(100%, 40vh);
         margin: 0 auto;
     }
 
-/* UI 位置与缩放调整，避免拥挤 */
-    #volume-control {
-        top: auto !important;   /* 取消顶部定位 */
-        left: auto !important;  /* 取消左侧定位 */
-        bottom: 5px !important; /* 贴紧底部 */
-        right: 5px !important;  /* 贴紧右侧 */
-        padding: 5px 8px !important;
-        transform: scale(0.8);
-        transform-origin: bottom right; /* 从右下角开始缩放 */
+    #ctrl-btn {
+        order: 0;
+        margin: 5px auto;
+        padding: 10px 25px;
+        font-size: 16px;
     }
 
+    /* 血量图片大小 */
+    #hp-img {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* 音量控制位置 */
+    #volume-control {
+        bottom: 5px !important;
+        right: 5px !important;
+        padding: 5px 8px !important;
+        transform: scale(0.8);
+        transform-origin: bottom right;
+    }
+
+    /* 全局计时器位置 */
     #speedrun-timer {
         top: 10px !important;
         right: 10px !important;
         font-size: 16px !important;
     }
 
-    /* 将隐藏的“喵”图标移动到顶部正中，避免挡住底部的开始按钮 */
+    /* 喵图标位置 */
     #cat-icon {
         bottom: auto !important;
         top: 10px !important;
@@ -441,31 +486,14 @@ body {
         height: 32px !important;
     }
 
-    /* 分数与顶栏的字号缩小 */
-    #score-display {
-        font-size: 22px;
-        margin-top: 0;
+    /* 商店内部紧凑 */
+    .tab-buttons {
+        margin-bottom: 10px;
     }
-    
-    #hp-img {
-        width: 40px;
-        height: 40px;
+    .tab-btn {
+        padding: 8px 0;
+        font-size: 14px;
     }
-    /* 新增：移动端把生命条往下挪一点 */
-    #hp-ui {
-        margin-top: 20px;
-    }
-
-    .game-btn {
-        padding: 10px 25px;
-        font-size: 16px;
-        margin-top: 5px;
-    }
-
-    /* 商店内容紧凑化调整 */
-    .tab-buttons { margin-bottom: 10px; }
-    .tab-btn { padding: 8px 0; font-size: 14px; }
-    
     .shop-item {
         padding: 12px;
         min-height: 80px;
@@ -475,12 +503,21 @@ body {
         height: 40px;
         margin-right: 10px;
     }
-    .item-name { font-size: 14px; margin-bottom: 2px; }
-    .item-desc { font-size: 11px; }
-    .item-price { font-size: 12px; }
-    .buy-btn { padding: 6px 12px; font-size: 12px; }
+    .item-name {
+        font-size: 14px;
+    }
+    .item-desc {
+        font-size: 11px;
+    }
+    .item-price {
+        font-size: 12px;
+    }
+    .buy-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
 
-    /* 成就项紧凑化 */
+    /* 成就项紧凑 */
     .ach-item {
         padding: 10px;
         min-height: auto;
@@ -490,15 +527,18 @@ body {
         font-size: 11px;
     }
 
-    /* 教程提示框适应小屏幕 */
+    /* 教程图片适配 */
     #tutorial-img {
         max-width: 95%;
         max-height: 50vh;
     }
-    #tutorial-overlay h2 { font-size: 24px !important; }
-    #tutorial-overlay p { font-size: 14px !important; }
+    #tutorial-overlay h2 {
+        font-size: 24px !important;
+    }
+    #tutorial-overlay p {
+        font-size: 14px !important;
+    }
 }
-
     </style>
 </head>
 <body>
