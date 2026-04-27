@@ -562,7 +562,7 @@ body {
             <!-- 标签按钮 -->
             <div class="tab-buttons">
 <div style="display: flex; justify-content: flex-end; margin-top: -5px; margin-bottom: 8px;">
-        <button onclick="clearGameSave()" style="
+        <button onclick="resetSave()" style="
             background: #c0392b;
             border: none;
             color: white;
@@ -995,14 +995,17 @@ function claimAchievement(id) {
         }
 
         // ================= 教程关闭 =================
-        function closeTutorial() {
-            document.getElementById('tutorial-overlay').style.display = 'none';
-            state.startTime = Date.now();
-            state.tutorialClosed = true;
-            startSpeedrunLoop();
-            document.getElementById('cat-icon').style.display = 'block';
-            startThinkerTimer();
-        }
+function closeTutorial() {
+    document.getElementById('tutorial-overlay').style.display = 'none';
+    // 仅当 startTime 为空（首次启动）时才重置计时起始点，避免覆盖已加载的存档时间
+    if (state.startTime === null) {
+        state.startTime = Date.now();
+    }
+    state.tutorialClosed = true;
+    startSpeedrunLoop();
+    document.getElementById('cat-icon').style.display = 'block';
+    startThinkerTimer();
+}
 
         document.getElementById('cat-icon').onclick = () => {
             playSFX('cat.mp3');
@@ -1675,22 +1678,14 @@ if (finalScore === 92 && state.upgrades.angel92 === 0) {
         }
 
         // ================= 存档系统（自动保存/加载） =================
-        // 需要持久化的关键字段（不保存游戏运行时临时状态，如计时器、地鼠等）
+        // 需要持久化的关键字段（增加 speedrunTime 和 elapsedMs）
         const SAVE_KEYS = [
             'score', 'hp', 'totalGoodHits', 'totalBadHits', 'maxComboEver',
             'longestGameTime', 'restartCount', 'catClicked', 'hitShinyCrit',
             'namidaHit', 'idleSeconds', 'upgrades', 'achievements',
-            'tutorialClosed', 'angel92Unlocked', 'isAngel92Active'  // 保留商店特殊解锁
+            'tutorialClosed', 'angel92Unlocked', 'isAngel92Active',
+            'speedrunTime'          // 保存已经过的秒数（浮点数）
         ];
-
-// 清空所有游戏存档并重置页面
-function clearGameSave() {
-    if (confirm('⚠️ 确定要清空所有存档吗？\n这将删除所有积分、升级、成就进度，并且页面会刷新。')) {
-        localStorage.removeItem('mb_game_save');
-        alert('存档已清除，页面即将刷新。');
-        location.reload();
-    }
-}
 
         // 保存游戏到 localStorage
         function saveGame() {
@@ -1698,7 +1693,6 @@ function clearGameSave() {
                 const saveData = {};
                 SAVE_KEYS.forEach(key => {
                     if (state.hasOwnProperty(key)) {
-                        // 深拷贝 achievements 和 upgrades 以避免引用问题
                         if (key === 'achievements') {
                             saveData[key] = JSON.parse(JSON.stringify(state[key]));
                         } else if (key === 'upgrades') {
@@ -1708,7 +1702,13 @@ function clearGameSave() {
                         }
                     }
                 });
-                // 额外保存成就描述映射（因为 desc 可能被动态修改）
+                // 额外保存已流逝的毫秒数（用于恢复 startTime）
+                if (state.startTime) {
+                    saveData.elapsedMs = Date.now() - state.startTime;
+                } else {
+                    saveData.elapsedMs = 0;
+                }
+                // 保存成就描述映射
                 saveData.achDescMap = {};
                 state.achievements.forEach(ach => {
                     if (ach.desc && ach.desc !== '???') {
@@ -1716,11 +1716,11 @@ function clearGameSave() {
                     }
                 });
                 localStorage.setItem('mb_game_save', JSON.stringify(saveData));
-                console.log('游戏已自动保存');
+                console.log('游戏已自动保存, 当前已用时:', (saveData.elapsedMs / 1000).toFixed(2) + 's');
             } catch(e) { console.warn('保存失败', e); }
         }
 
-        // 加载存档，合并到当前 state（保留原有结构）
+        // 加载存档，合并到当前 state
         function loadGame() {
             const raw = localStorage.getItem('mb_game_save');
             if (!raw) return false;
@@ -1730,7 +1730,6 @@ function clearGameSave() {
                 SAVE_KEYS.forEach(key => {
                     if (saved.hasOwnProperty(key) && state.hasOwnProperty(key)) {
                         if (key === 'achievements') {
-                            // 合并成就数据：保留原有结构，更新解锁/领取状态及自定义desc
                             const savedAchs = saved[key];
                             if (Array.isArray(savedAchs)) {
                                 savedAchs.forEach(savedAch => {
@@ -1749,13 +1748,32 @@ function clearGameSave() {
                         }
                     }
                 });
-                // 恢复成就自定义描述（备用）
+                // 恢复成就自定义描述
                 if (saved.achDescMap) {
                     state.achievements.forEach(ach => {
                         if (saved.achDescMap[ach.id]) ach.desc = saved.achDescMap[ach.id];
                     });
                 }
-                // 确保一些重要字段有效
+                // 关键：恢复计时器起始时间
+                if (saved.elapsedMs !== undefined && saved.elapsedMs > 0) {
+                    const elapsedSec = saved.elapsedMs / 1000;
+                    // 如果已有 speedrunTime 且接近 elapsedSec，直接使用；否则以 elapsedSec 为准
+                    if (typeof state.speedrunTime !== 'number' || Math.abs(state.speedrunTime - elapsedSec) > 0.1) {
+                        state.speedrunTime = elapsedSec;
+                    }
+                    // 重建 startTime，让计时器从正确的流逝时间继续
+                    state.startTime = Date.now() - saved.elapsedMs;
+                    // 更新屏幕上的计时器显示
+                    const speedrunTimer = document.getElementById('speedrun-timer');
+                    if (speedrunTimer) {
+                        speedrunTimer.innerText = state.speedrunTime.toFixed(2) + 's';
+                    }
+                } else {
+                    // 没有存档时间记录，则重置计时器起始点（但不清零速度run）
+                    state.startTime = Date.now();
+                }
+                
+                // 确保基础数值有效
                 if (typeof state.hp !== 'number' || state.hp < 1) state.hp = 4;
                 if (typeof state.score !== 'number') state.score = 0;
                 if (!state.upgrades) state.upgrades = window.initialUpgrades ? { ...window.initialUpgrades } : {};
@@ -1763,7 +1781,7 @@ function clearGameSave() {
                 state.globalMultiplier = (state.upgrades.angel92 > 0 || state.isAngel92Active) ? 2.0 : 1.0;
                 if (state.upgrades.angel92 > 0) state.isAngel92Active = true;
                 
-                console.log('存档加载成功', saved);
+                console.log('存档加载成功，已恢复计时: ' + state.speedrunTime.toFixed(2) + 's');
                 return true;
             } catch(e) {
                 console.warn('读取存档失败', e);
@@ -1771,7 +1789,7 @@ function clearGameSave() {
             }
         }
 
-        // 重置存档（可选，用于调试，不绑定UI，但留着备用）
+        // 重置存档
         function resetSave() {
             if (confirm('⚠️ 删除所有存档数据，重置游戏进度？此操作不可撤销。')) {
                 localStorage.removeItem('mb_game_save');
@@ -1779,7 +1797,7 @@ function clearGameSave() {
             }
         }
 
-        // 关键状态变化时自动保存（封装一个节流保存，避免过于频繁）
+        // 自动保存（防抖）
         let saveTimer = null;
         function autoSave() {
             if (saveTimer) clearTimeout(saveTimer);
@@ -1789,17 +1807,8 @@ function clearGameSave() {
             }, 200);
         }
 
-        // 拦截 state 的常用修改点：在 updateUI 和 checkAchievements 等关键函数末尾调用 autoSave
-        // 注意：我们需要修补原有函数，在关键位置注入 autoSave，而不破坏原有逻辑。
-        // 为了保持代码整洁，在页面加载完成后对必要函数进行“猴子补丁”或者直接重写相关函数尾部。
-        // 但最简单的办法：在原有 updateUI、buyItem、claimAchievement、gameOver、handleRestart 等函数尾部增加 autoSave。
-        // 由于这些函数在原代码中已存在，我们不能直接删掉它们。更好的方案：在页面初始化时备份原函数并包装。
-        // 为了避免复杂化，我们直接在下面的初始化代码中重写这几个关键函数（保留原逻辑 + 加入 autoSave）。
-        // 注意：原代码中这些函数已经定义，我们需要在它们定义之后、游戏启动之前进行替换。
-        // 下面采用“保存原函数引用，重新定义”的方式，确保自动保存被触发。
-        
+        // 在关键函数尾部注入 autoSave
         function applyAutoSaveHooks() {
-            // 备份关键函数
             const originalUpdateUI = window.updateUI;
             const originalCheckAchievements = window.checkAchievements;
             const originalBuyItem = window.buyItem;
@@ -1857,33 +1866,31 @@ function clearGameSave() {
                     autoSave();
                 };
             }
-            // 额外劫持 score 直接修改的场景？实际上分数只在 handleHit 和 claimAchievement 等变化，已覆盖
         }
 
-        // 在页面加载完毕后，先尝试加载存档，再应用钩子，然后刷新UI和商店。
+        // 页面加载时尝试读取存档并恢复计时器循环
         window.addEventListener('DOMContentLoaded', () => {
-            // 确保 state 对象已经存在（原代码已定义）
             if (typeof state !== 'undefined') {
-                // 提前保存一份初始升级结构，用于合并
                 if (!window.initialUpgrades) {
                     window.initialUpgrades = JSON.parse(JSON.stringify(state.upgrades));
                 }
                 const hasSave = loadGame();
                 if (hasSave) {
-                    console.log('已读取到存档，恢复进度');
-                    // 强制刷新 UI 和商店、成就列表
+                    // 刷新UI和商店
                     if (typeof updateUI === 'function') updateUI();
                     if (typeof initShop === 'function') initShop();
                     if (typeof renderAchievements === 'function') renderAchievements();
-                    // 恢复血量图片显示
-                    if (typeof updateUI === 'function') updateUI();
-                    // 如果游戏未结束，需要重置一些运行时标志（避免残留地鼠）
+                    
+                    // 重新启动全局计时循环（如果 speedrun 循环未运行）
+                    if (typeof startSpeedrunLoop === 'function') {
+                        if (window.speedrunInterval) cancelAnimationFrame(window.speedrunInterval);
+                        startSpeedrunLoop();
+                    }
+                    
+                    // 如果游戏未结束，但计时器混乱，强制清理残留地鼠
                     if (!state.isGameOver) {
-                        state.isGameOver = true; // 安全性：强制将游戏置为未开始状态，避免计时器残留
-                        if (typeof clearInterval === 'function') {
-                            if (window.timeLoop) clearInterval(window.timeLoop);
-                            if (window.speedrunInterval) cancelAnimationFrame(window.speedrunInterval);
-                        }
+                        state.isGameOver = true; // 安全起见置为未开始
+                        if (window.timeLoop) clearInterval(window.timeLoop);
                         const ctrlBtn = document.getElementById('ctrl-btn');
                         if (ctrlBtn) {
                             ctrlBtn.style.visibility = 'visible';
@@ -1893,18 +1900,9 @@ function clearGameSave() {
                         }
                         document.querySelectorAll('.mole').forEach(m => m.classList.remove('up'));
                     }
-                    // 重新开始速通计时器
-                    if (typeof startSpeedrunLoop === 'function' && state.startTime) {
-                        // 如果有 startTime 但 loop 被清除，重新启动
-                        if (window.speedrunInterval) cancelAnimationFrame(window.speedrunInterval);
-                        state.startTime = Date.now() - (state.speedrunTime * 1000 || 0);
-                        startSpeedrunLoop();
-                    }
                 }
-                // 应用自动保存钩子
                 applyAutoSaveHooks();
             } else {
-                console.warn('state未定义，稍后重试');
                 setTimeout(() => {
                     if (typeof state !== 'undefined') {
                         loadGame();
@@ -1912,11 +1910,11 @@ function clearGameSave() {
                         if (typeof updateUI === 'function') updateUI();
                         if (typeof initShop === 'function') initShop();
                         if (typeof renderAchievements === 'function') renderAchievements();
+                        if (typeof startSpeedrunLoop === 'function') startSpeedrunLoop();
                     }
                 }, 100);
             }
         });
-
         ctrlBtn.onclick = startGame;
 
         initShop();
