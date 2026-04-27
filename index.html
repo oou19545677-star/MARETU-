@@ -25,7 +25,6 @@
             height: 100vh;
         }
 
-        /* 统一大按钮 */
         .game-btn {
             padding: 15px 35px;
             font-size: 18px;
@@ -41,7 +40,6 @@
         .game-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5); }
         .game-btn:active { transform: translateY(1px); }
 
-        /* 教程遮罩层 */
         #tutorial-overlay {
             position: fixed;
             inset: 0;
@@ -60,14 +58,12 @@
             box-shadow: 0 0 30px rgba(255,255,255,0.1);
         }
 
-        /* 游戏主容器 */
         #main-container {
             display: flex;
             width: 100%;
             height: 100vh;
         }
 
-        /* ================= 左侧游戏区 ================= */
         #game-area {
             flex: 7;
             position: relative;
@@ -78,15 +74,10 @@
             padding: 30px 20px;
             box-sizing: border-box;
         }
+        #volume-control {
+            /* 位置由内联样式控制，此处保留空或直接删除整个块 */
+        }
 
-#volume-control {
-    position: absolute; 
-    bottom: 20px; 
-    left: 20px; 
-    z-index: 999;
-}
-
-        /* 顶部UI条 */
         #top-ui {
             width: 100%;
             max-width: 700px;
@@ -139,94 +130,106 @@
             border: 3px solid #333;
             box-shadow: inset 0 5px 10px rgba(0,0,0,0.8);
         }
-.mole {
-    position: absolute;
-    /* 1. 移除 top，因为它和 bottom 冲突 */
-    /* top: -3%; */ 
-    
-    /* 2. 这里的 bottom 控制“缩回”时的位置，设为 -100% 刚好隐藏 */
-    bottom: -100%; 
-    
-    /* 3. 水平居中：left 配合 transform 是最稳的 */
-    left: 50%;
-    transform: translateX(-50%);
-    
-    width: 92%;
-    height: 92%;
-    
-    /* 4. 如果觉得图片整体还是偏上，可以通过 margin-top 微调 */
-    margin-top: 5%; 
-    
-    transition: bottom 0.08s ease-out;
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-drag: none;
-}
-
-.mole.up {
-    /* 5. 这里控制“冒头”的位置，数字越大，地鼠就越靠上 */
-    /* 如果想让它往下点，把这个 10% 减小，比如改成 5% 或 2% */
-    bottom: 5%; 
-}
+        .mole {
+            position: absolute;
+            bottom: -100%; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            object-fit: cover;      /* 保持图片填充裁剪，不变形 */
+            transition: bottom 0.08s ease-out;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .mole.up {
+            bottom: 0; 
+        }
 
         #timer-display { font-size: 24px; font-weight: bold; color: #aaa; }
 
-.distort-active {
-            animation: screenDistort 0.5s ease-in-out;
-        }
-
+        .distort-active { animation: screenDistort 0.5s ease-in-out; }
         @keyframes screenDistort {
             0% { transform: scale(1); filter: hue-rotate(0deg); }
             50% { transform: scale(1.05) rotate(2deg); filter: hue-rotate(90deg); }
             100% { transform: scale(1); filter: hue-rotate(0deg); }
         }
-        /* 到这里结束 */
 
-/* 添加到你的 <style> 中 */
-.poison-mushroom-active {
-    /* 关键：引用上面定义的 SVG 滤镜 ID */
-    filter: url(#mushroom-distort);
-    
-    /* 可选：加一点迷幻的色彩旋转，更有吃了毒蘑菇的感觉 */
-    animation: hueFever 5s linear indefinite;
-    
-    /* 确保扭曲时不会露出外面的背景 */
-    transform: scale(1.05); 
-    transition: filter 0.3s ease;
+        .poison-mushroom-active {
+            filter: url(#mushroom-distort);
+            animation: hueFever 5s linear indefinite;
+            transform: scale(1.05); 
+            transition: filter 0.3s ease;
+        }
+        @keyframes hueFever {
+            0% { filter: url(#mushroom-distort) hue-rotate(0deg); }
+            100% { filter: url(#mushroom-distort) hue-rotate(360deg); }
+        }
+
+#shop-area {
+    flex: 3;
+    background: var(--panel-bg);
+    border-left: 2px solid #2c2c2c;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: hidden;          /* 改成 hidden，内部各个面板自己滚 */
+    max-height: 100vh;
 }
 
-/* 迷幻色彩动画 */
-@keyframes hueFever {
-    0% { filter: url(#mushroom-distort) hue-rotate(0deg); }
-    100% { filter: url(#mushroom-distort) hue-rotate(360deg); }
-}
-
-
-        /* ================= 右侧商店区 ================= */
-        #shop-area {
-            flex: 3;
-            background: var(--panel-bg);
-            border-left: 2px solid #2c2c2c;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        #shop-title {
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-            color: #fff;
-        }
         #shop-list {
             flex: 1;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 15px;
+            min-height: 50px; /* 防止塌陷 */
         }
         #shop-list::-webkit-scrollbar { width: 0; }
+
+        /* 标签按钮 */
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            text-align: center;
+            background: #252525;
+            border: none;
+            color: #aaa;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tab-btn.active {
+            background: #2ecc71;
+            color: #111;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .tab-content.active {
+            display: flex;
+        }
+        .tab-content::-webkit-scrollbar { width: 0; }
+
+        #shop-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
         .shop-item {
             display: flex;
@@ -236,15 +239,15 @@
             border-radius: 12px;
             border: 1px solid #3a3a3a;
             transition: background 0.2s;
-            height: 100px; /* 略微调高一点以容纳文本 */
+            height: 100px; 
             box-sizing: border-box;
         }
         .shop-item.locked { filter: grayscale(1); opacity: 0.3; }
-        .item-icon { width: 55px; height: 55px; margin-right: 15px; border-radius: 8px; object-fit: cover;}
+        .item-icon { width: 55px; height: 55px; margin-right: 15px; border-radius: 8px; object-fit: cover; }
         .item-info { flex: 1; }
-        .item-name { font-size: 16px; font-weight: bold; color: #fff; margin-bottom: 4px;}
-        .item-desc { font-size: 12px; color: #aaa; line-height: 1.3;}
-        .item-price { font-size: 13px; color: var(--neon-gold); margin-top: 3px; font-weight: bold;}
+        .item-name { font-size: 16px; font-weight: bold; color: #fff; margin-bottom: 4px; }
+        .item-desc { font-size: 12px; color: #aaa; line-height: 1.3; }
+        .item-price { font-size: 13px; color: var(--neon-gold); margin-top: 3px; font-weight: bold; }
         
         .buy-btn { 
             padding: 8px 16px; 
@@ -259,20 +262,17 @@
         .buy-btn.can-buy { background: #3498db; }
         .buy-btn.can-buy:hover { background: #2980b9; }
 
-.float-text {
+        .float-text {
             position: fixed;
             color: var(--neon-gold);
             font-weight: bold;
-            font-size: 18px; /* 调大一点更醒目 */
+            font-size: 18px; 
             pointer-events: none;
-            /* z-index 设为 9999，确保在最顶层 */
             z-index: 9999; 
             text-shadow: 0 0 5px black, 0 0 10px black;
-            /* 居中核心：将元素中心移到指定坐标 */
             transform: translateX(-50%); 
             animation: floatUp 1.2s ease-out forwards;
         }
-
         @keyframes floatUp {
             0% { transform: translateX(-50%) translateY(0); opacity: 1; }
             100% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
@@ -281,7 +281,6 @@
         #umnos-overlay {
             position: fixed;
             inset: 0;
-            /* 修改这里：20% 透明度的黑色背景 */
             background: rgba(0, 0, 0, 0.2);
             display: none;
             z-index: 2000;
@@ -308,6 +307,62 @@
             max-width: 300px;
         }
         .modal-btns { display: flex; justify-content: space-around; margin-top: 20px; }
+
+
+        .ach-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            background: #1e1e1e;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #aaa;
+            min-height: 70px;
+        }
+
+        .ach-item .ach-claim-btn {
+            padding: 4px 10px;
+            font-size: 12px;
+            background: #333;
+            border: none;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .ach-item .ach-claim-btn.enabled {
+            background: #2ecc71;
+            color: black;
+            font-weight: bold;
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glowPulse {
+            0% { text-shadow: 0 0 10px gold, 0 0 20px gold, 0 0 40px orange; }
+            50% { text-shadow: 0 0 20px gold, 0 0 40px orange, 0 0 80px yellow; }
+            100% { text-shadow: 0 0 10px gold, 0 0 20px gold, 0 0 40px orange; }
+        }
+        @keyframes floatUpParticle {
+            0% { opacity: 0; transform: translateY(0) rotate(0deg); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-100vh) rotate(720deg); }
+        }
+        .celeb-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: gold;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            animation: floatUpParticle linear infinite;
+        }
+
     </style>
 </head>
 <body>
@@ -322,7 +377,7 @@
     </div>
 
     <div id="umnos-overlay">
-        <img id="umnos-img" src="assets/umnos.png" alt="复活">
+                <img id="umnos-img" src="assets/umnos.png" alt="复活" style="user-select:none; pointer-events:none;" draggable="false">
     </div>
 
     <div id="doctor-modal" class="custom-modal" style="display:none;">
@@ -337,11 +392,17 @@
 
     <div id="main-container">
         <div id="game-area">
+            <div id="speedrun-timer" style="position: absolute; top: 20px; right: 20px; color: gold; font-size: 24px; font-weight: bold; font-family: monospace; z-index: 999; text-shadow: 0 0 5px black;">
+                0.00s
+            </div>
+
+            <!-- 喵图标 -->
+<img id="cat-icon" src="assets/nya.png" style="position: absolute; bottom: 20px; left: 20px; width: 40px; height: 40px; cursor: pointer; z-index: 1000; display: none;" title="喵？">
+
             <div id="top-ui">
                 <div id="hp-ui">
                     <img id="hp-img" src="assets/hp1.png" alt="HP">
                 </div>
-                
             </div>
 
             <div id="score-display">积分: 0</div>
@@ -352,1318 +413,1134 @@
             <div id="timer-display" style="visibility: hidden;">0s/20s</div>
         </div>
 
-<div id="volume-control" style="position: absolute; bottom: 20px; left: 20px; z-index: 999; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px;">
-    <div style="margin-bottom: 10px;">
-        <label style="color: #aaa; font-size: 12px;">BGM</label>
-        <input type="range" id="bgm-slider" min="0" max="1" step="0.1" value="0.5">
-    </div>
-    <div>
-        <label style="color: #aaa; font-size: 12px;">音效</label>
-        <input type="range" id="sfx-slider" min="0" max="1" step="0.1" value="0.5">
-    </div>
-</div>
+        <div id="volume-control" style="position: absolute; top: 20px; left: 20px; z-index: 999; background: rgba(0,0,0,0.55); padding: 8px 10px; border-radius: 6px; display: flex; gap: 12px; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 4px;">
+                <label style="color: #aaa; font-size: 11px;">BGM</label>
+                <input type="range" id="bgm-slider" min="0" max="1" step="0.1" value="0.5" style="width: 70px;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px;">
+                <label style="color: #aaa; font-size: 11px;">音效</label>
+                <input type="range" id="sfx-slider" min="0" max="1" step="0.1" value="0.5" style="width: 70px;">
+            </div>
+        </div>
 
         <div id="shop-area">
-            <div id="shop-title">底层商店</div>
-            <div id="shop-list"></div>
+            <!-- 标签按钮 -->
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('shop')">不明之地</button>
+                <button class="tab-btn" onclick="switchTab('achievement')">成就</button>
+            </div>
+
+            <!-- 商店标签页 -->
+            <div id="tab-shop" class="tab-content active">
+                <div style="text-align:center; font-size:24px; margin-bottom:15px; color:#fff; letter-spacing:2px;">底层商店</div>
+                <div id="shop-list"></div>
+            </div>
+
+
+            <!-- 成就标签页 -->
+            <div id="tab-achievement" class="tab-content">
+                <div style="text-align:center; font-size:24px; margin-bottom:15px; color:#fff; letter-spacing:2px;">成就</div>
+                <div id="achievement-list"></div>
+            </div>
         </div>
     </div>
 
-<script>
+    <script>
 
-// 统一的全局音频状态
-const audioSettings = {
-    bgmVolume: 0.5,
-    sfxVolume: 0.5
-};
+        // ================= 标签切换 =================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            if (tab === 'shop') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('tab-shop').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('tab-achievement').classList.add('active');
+            }
+        }
 
-// 创建 Audio 对象
-const bgm = new Audio('assets/bgm.mp3');
-bgm.loop = true;
+        // ================= 全局音频 =================
+        const audioSettings = {
+            bgmVolume: 0.5,
+            sfxVolume: 0.5
+        };
+        const bgm = new Audio('assets/bgm.mp3');
+        bgm.loop = true;
 
-// 监听滑块
-document.getElementById('bgm-slider').oninput = (e) => {
-    audioSettings.bgmVolume = e.target.value;
-    bgm.volume = audioSettings.bgmVolume;
-};
-
+        document.getElementById('bgm-slider').oninput = (e) => {
+            audioSettings.bgmVolume = e.target.value;
+            bgm.volume = audioSettings.bgmVolume;
+            checkAchievements();
+        };
 document.getElementById('sfx-slider').oninput = (e) => {
     audioSettings.sfxVolume = e.target.value;
+    updateSoundPoolVolume();   // 立即更新所有音效池对象的音量
+    checkAchievements();
 };
 
-// 专业音效分发函数
-function playSFX(src) {
-    const sfx = new Audio('assets/' + src);
-    sfx.volume = audioSettings.sfxVolume; // 独立音效音量
-    sfx.play().catch(()=>{});
+// 固定音效池，循环使用（方案一）
+const SOUND_POOL_SIZE = 6;   // 同时最多播放6个音效，可根据需要调整
+const soundPool = [];
+let currentSoundIdx = 0;
+
+// 预先创建固定数量的 Audio 对象并设置初始音量
+for (let i = 0; i < SOUND_POOL_SIZE; i++) {
+    const audio = new Audio();
+    audio.volume = audioSettings.sfxVolume;
+    soundPool.push(audio);
 }
 
-    const CONFIG = {
-        totalGameTime: 20,
-        baseRate: 1300,
-        badMoleProb: 0.1,
-        moleAnimTime: 80,
-    };
-
-    let state = {
-        hp: 4,
-        score: 0,
-        combo: 0,
-        molesHit: 0,
-        currentTime: 0,
-        isGameOver: true,
-        currentSpeedScale: 1.0,
-        isUmnosUsed: false,
-        is92Used: false,
-        isDoctorActive: false,
-        moleTimeouts: [],
-        activeMoleHole2: null,
-        activeMoleHole: null,
-        angel92Unlocked: false,
-        isAngel92Active: false,
-        globalMultiplier: 1.0,
-        upgrades: {
-            nianwei: 0, umnos: 0, darling: 0, angel92: 0, scissors: 0,
-            shiny: 0, birth: 0, taste: 0, aim: 0, doctor: 0, pink: 0, 
-            birthLonging: 0,  dance: 0, eraser: 0, two_year_celebration: 0
-        }
-    };
-
-const SHOP_ITEMS = [
-    { id: 'nianwei',      name: '廿未',       icon: 'assets/nianwei.png',     prices: [20, 200, 2000], max: 3, sfx: 'nianwei.mp3' },
-    { id: 'birthLonging', name: '渴望诞生',   icon: 'assets/umtgr.png',      prices: [200, 800, 1600, 2800, 5000], max: 5, sfx: 'longing.mp3' },
-    { id: 'umnos',       name: '重新分娩',   icon: 'assets/umnos.png',      prices: [500], max: 1, sfx: 'umnos2.mp3' },
-    { id: 'darling',     name: '亲爱的',     icon: 'assets/darling.png',    prices: [150, 400, 900, 1500, 5000], max: 5, sfx: 'darling2.mp3' },
-    { id: 'scissors',    name: '神奇剪刀',   icon: 'assets/shibaizuo.png', prices: [100, 200, 350, 500, 750, 1000, 1250, 1500, 2000, 3000], max: 10, sfx: 'scissors.mp3' },
-    { id: 'shiny',       name: '闪闪发光的...', icon: 'assets/faguang.png',  prices: [1000, 2000, 3000, 4000, 5000], max: 5, sfx: 'shiny.mp3' },
-    { id: 'birth',       name: '诞生之前',   icon: 'assets/danqian.png',    prices: [100, 200, 350, 500, 750, 1000, 1250, 1500, 2000, 3000], max: 10, sfx: 'birth.mp3' },
-    { id: 'taste',       name: '美之味',     icon: 'assets/mzw.png',        prices: [1000, 2000, 3000, 5000, 8000], max: 5, sfx: 'taste.mp3' },
-    { id: 'aim',         name: '高位瞄准',   icon: 'assets/imh.png',        prices: [600, 1000, 1500, 2000, 4000], max: 5, sfx: 'aim.mp3' },
-    { id: 'angel92',     name: '天使92',     icon: 'assets/92.png',         prices: [0], max: 1, special: true, sfx: 'angel.mp3' },
-    { id: 'doctor',      name: '魔法医生',   icon: 'assets/moyi.png',       prices: [6666], max: 1, sfx: 'doctor.mp3' },
-    { id: 'pink',        name: 'Pink',       icon: 'assets/pink.png',       max: 100, sfx: 'pink.mp3', prices: Array.from({length: 100}, (_, i) => Math.floor(15 * Math.pow(1.35, i))) },
-    { id: 'dance',       name: '生命之舞',   icon: 'assets/mw.png',         prices: [100, 200, 400, 600, 800, 1000, 1200], max: 7, sfx: 'dance.mp3' },
-    { id: 'eraser',      name: '少女橡皮擦', icon: 'assets/xpc.png',        prices: [400], max: 1, sfx: 'eraser.mp3' },
-    { id: 'two_year_celebration',      name: '???', icon: 'assets/mrttt.png',        prices: [100000], max: 1},
-
-];
-
-    const grid = document.getElementById('grid');
-    for (let i = 0; i < 25; i++) {
-        const hole = document.createElement('div');
-        hole.className = 'hole';
-        hole.dataset.index = i;
-        const mole = document.createElement('img');
-        mole.className = 'mole';
-        hole.appendChild(mole);
-        grid.appendChild(hole);
+// 更新音效池中所有音效的音量（用于音量滑块实时调整）
+function updateSoundPoolVolume() {
+    for (let audio of soundPool) {
+        audio.volume = audioSettings.sfxVolume;
     }
-
-    const holes = document.querySelectorAll('.hole');
-    const hpImg = document.getElementById('hp-img');
-    const scoreDisp = document.getElementById('score-display');
-    const ctrlBtn = document.getElementById('ctrl-btn');
-    const timerDisp = document.getElementById('timer-display');
-    const speedDisp = document.getElementById('speed-ui');
-    
-    let timeLoop;
+}
 
 function playSFX(src) {
-    const audio = new Audio('assets/' + src);
-    audio.volume = audioSettings.sfxVolume; 
-    audio.play().catch(()=>{});
-}
-
-// 专门处理 BGM 的函数
-
-function playBGM() {
-
-    bgm.volume = audioSettings.bgmVolume;
-
-    bgm.play().catch(()=>{});
-
-}
-
-    function closeTutorial() {
-
-        document.getElementById('tutorial-overlay').style.display = 'none';
-
-    }
-
-
-
-    function getItemDesc(id, lv) {
-
-        const spanY = (num) => `<span style="color:yellow">${num}</span>`;
-
-        switch(id) {
-
-            case 'nianwei': 
-
-                return `每满${spanY(20)}个...，积分就会增加${spanY((lv||1)*50)}%（可无限叠加哦！）`;
-
-            case 'birthLonging': 
-
-                return `一开始他就可以满${spanY((lv*15)||15)}个...`;
-
-            case 'scissors': return `能够剪掉${spanY((lv * 5) || 5)}%个刘海（什么！？）`;
-
-            case 'umnos': return `获得一次“重生”的机会（大概）`;
-
-            case 'darling': return `Darling会保护你${spanY(lv||1)}次`;
-
-            case 'angel92': 
-
-    return (Math.floor(state.score) === 92 || state.upgrades.angel92 > 0) ? `⁽⁽ଘ( ˊᵕˋ )ଓ⁾⁾*：天使の数字会让你“积分翻倍！”` : `未解锁：这个东西需要满足一些东西才能购买...`;
-
-            case 'shiny': return `Mind Brand们现在有${spanY((lv||1)*2)}%的概率变为闪闪发光的`;
-
-            case 'birth': return `让你从负${spanY((lv||1)*3)}秒时开始游戏`;
-
-            case 'taste': return `你现在可以吃掉她...每${spanY(40 - (lv*3))}个能让你回复血量`;
-
-            case 'aim': return `你现在有${spanY((lv||1)*2)}%的概率暴击，获得300%积分  I'm(≧A≦)HIGH!!!`;
-
-            case 'doctor': return `<span style="color:red">购买后或许会有不太好的事情发生...</span>`;
-
-            case 'pink': 
-
-                const totalBonus = (Math.pow(1.15, lv) - 1) * 100;
-
-                return `你好！我能让Mind Brand的价值+15%（乘算哦!!）。当前总加成: ${spanY(totalBonus.toFixed(1))}%`;
-
-case 'dance': 
-
-    return `生命之舞会让你每次敲打Mind Brand后有 ${spanY((lv||1)*4)}% 概率+1s ^_^`;
-
-case 'eraser': return `橡皮擦会帮你擦出来一个全新的Mind Brand！`;
-case 'two_year_celebration': 
-    return `???`;
-
-
-
-            default: return '';
-
-        }
-
-    }
-
-
-
-function initShop() {
-    const list = document.getElementById('shop-list');
-
-    // 1. 获取所有普通道具并排序
-    const normalItems = SHOP_ITEMS.filter(i => 
-        !i.special && i.id !== 'doctor' && i.id !== 'two_year_celebration'
-    ).sort((a,b) => {
-        const priceA = state.upgrades[a.id] >= a.max ? Infinity : a.prices[state.upgrades[a.id]];
-        const priceB = state.upgrades[b.id] >= b.max ? Infinity : b.prices[state.upgrades[b.id]];
-        return priceA - priceB;
-    });
-
-    // 2. 查找特殊道具
-    const angelItem = SHOP_ITEMS.find(i => i.id === 'angel92');
-    const doctorItem = SHOP_ITEMS.find(i => i.id === 'doctor');
-    const celebrationItem = SHOP_ITEMS.find(i => i.id === 'two_year_celebration'); // 新增查找
-
-    // 3. 【关键修改】拼接逻辑：普通道具 -> 天使92 -> 医生 -> 周年道具(最后)
-    const finalItems = [...normalItems, angelItem, doctorItem, celebrationItem];
-
-    list.innerHTML = finalItems.map(item => {
-        // 如果找不到该道具（防御性编程），跳过
-        if (!item) return ''; 
-
-        const curLv = state.upgrades[item.id] || 0;
-        const maxed = curLv >= item.max;
+    try {
+        const audio = soundPool[currentSoundIdx];
+        currentSoundIdx = (currentSoundIdx + 1) % SOUND_POOL_SIZE;
         
-        // 处理没有 prices 数组的道具（比如 Pink）
-        const price = item.prices ? item.prices[curLv] : 0; 
-        const canAfford = state.score >= price;
+        // 停止当前可能正在播放的声音，重置并加载新音源
+        audio.pause();
+        audio.currentTime = 0;
+        audio.src = 'assets/' + src;
         
-        // 天使92的锁定逻辑
-        const is92Locked = item.id === 'angel92' && state.upgrades.angel92 === 0 && Math.floor(state.score) !== 92;
-
-        let btnHtml = '';
-        // 如果是周年道具，设置特殊的购买按钮
-        if (item.id === 'two_year_celebration') {
-            btnHtml = `<button class="buy-btn ${state.score >= 100000 ? 'can-buy':''}" onclick="buyItem('two_year_celebration')">购买</button>`;
-        } else if (!item.special || (item.id === 'angel92' && !is92Locked)) {
-            const btnText = curLv === 0 ? "购买" : "升级";
-            if (!maxed) {
-                btnHtml = `<button class="buy-btn ${canAfford?'can-buy':''}" onclick="buyItem('${item.id}')">${btnText}</button>`;
-            } else {
-                btnHtml = `<button class="buy-btn" disabled style="opacity:0.5; cursor:not-allowed;">满级</button>`;
-            }
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(err => {
+                console.warn('音效播放被阻止:', src, err);
+                // 可选：稍后重试一次
+                setTimeout(() => {
+                    if (audio.src.endsWith(src)) audio.play().catch(()=>{});
+                }, 100);
+            });
         }
-
-        return `
-            <div class="shop-item ${is92Locked ? 'locked' : ''}" id="item-${item.id}">
-                <img src="${item.icon}" class="item-icon">
-                <div class="item-info">
-                    <div class="item-name">${item.name} ${item.max > 1 ? `<span style="color:#2ecc71">Lv.${curLv}</span>` : ''}</div>
-                    <div class="item-desc">${getItemDesc(item.id, curLv)}</div>
-                    <div class="item-price">${is92Locked ? '条件未达成' : (maxed ? 'MAX' : '价格: ' + price)}</div>
-                </div>
-                ${btnHtml}
-            </div>
-        `;
-    }).join('');
+    } catch(e) {
+        console.warn('音效异常:', src, e);
+    }
 }
-
-
-function buyItem(id) {
-
-    const item = SHOP_ITEMS.find(i => i.id === id);
-
-if (id === 'two_year_celebration') {
-        if (state.score >= 100000) {
-            state.score -= 100000;
-            triggerTwoYearCelebration();
-        } else {
-            showFloatingText("积分不足...", window.innerWidth/2, window.innerHeight/2);
-        }
-        return;
-    }
-
-    const curLv = state.upgrades[id];
-
-    const price = item.prices[curLv];
-
-
-
-    if (curLv < item.max && state.score >= price) {
-
-        // 如果是医生，我们仍然保留弹窗确认逻辑
-
-        if (id === 'doctor') {
-
-            document.getElementById('doctor-modal').style.display = 'flex';
-
-            return;
-
-        }
-
-
-
-        // --- 核心改动：播放专属音效 ---
-
-        if (item.sfx) {
-
-            playSFX(item.sfx);
-
-        } else {
-
-            playSFX('default_buy.mp3'); // 给一个兜底的默认音效
-
-        }
-
-
-
-        state.score -= price;
-
-        state.upgrades[id]++;
-
-        updateUI();
-
-        initShop();
-
-    }
-
-}
-
-function confirmDoctor(yes) {
-
-        document.getElementById('doctor-modal').style.display = 'none';
-
-        if (yes) {
-
-            const price = 666;
-
-            if (state.score >= price) {
-
-                state.score -= price;
-
-                state.upgrades.doctor = 1;
-
-                state.isDoctorActive = true; // 激活状态
-
-                
-
-                // --- 关键：触发扭曲动画 ---
-
-                document.body.classList.add('distort-active');
-
-                setTimeout(() => document.body.classList.remove('distort-active'), 500);
-
-                
-
-                playSFX('doctor.mp3');
-
-                showFloatingText("正在进行微调...", window.innerWidth/2, window.innerHeight/2);
-
-                
-
-                updateUI();
-
-                initShop();
-
-            }
-
-        }
-
-    }
-
-function startGame() {
-
-    if (!state.isGameOver) return;
-
-
-
-    // 1. 重置基础配置
-
-    CONFIG.totalGameTime = 20; 
-
-    state.currentTime = - (state.upgrades.birth * 3);
-
-    
-
-    // 2. 清理场面
-
-    state.activeMoleHole = null;
-
-    state.activeMoleHole2 = null;
-
-    document.querySelectorAll('.mole').forEach(mole => {
-
-        mole.classList.remove('up');
-
-        mole.style.cssText = ''; 
-
-    });
-
-
-
-    // 3. 重置局内核心状态
-
-    state.hp = 4;
-
-    state.combo = state.upgrades.birthLonging * 15;
-
-    state.molesHit = 0;
-
-    state.isUmnosUsed = false;
-
-    state.is92Used = false;
-
-    state.isDoctorActive = false;
-
-    state.currentSpeedScale = 1.0;
-
-    state.isGameOver = false;
-
-
-
-// 4. 【核心修复】自动挂载逻辑 (放在重置之后)
-
-    // 必须是玩家真正在商店购买了（等级>0）才会激活
-
-    if (state.upgrades.angel92 > 0) {
-
-        state.isAngel92Active = true;
-
-        state.globalMultiplier = 2.0;
-
-    } else {
-
-        state.isAngel92Active = false;
-
-        state.globalMultiplier = 1.0;
-
-    }
-
-    
-
-    // 5. 启动循环
-
-    bgm.play().catch(e => console.log("等待用户交互后播放"));
-
-    updateUI();
-
-    timerDisp.innerText = `${state.currentTime}s/${CONFIG.totalGameTime}s`;
-
-    timerDisp.style.visibility = 'visible';
-
-    ctrlBtn.style.visibility = 'hidden';
-
-
-
-    nextMole();
-
-
-
-    timeLoop = setInterval(() => {
-
-        state.currentTime++;
-
-        timerDisp.innerText = `${state.currentTime}s/${CONFIG.totalGameTime}s`;
-
-        if (state.currentTime >= CONFIG.totalGameTime) {
-
-            gameOver();
-
-        }
-
-    }, 1000);
-
-}
-
-// 1. 统一生成逻辑
-
-function nextMole() {
-
-if (state.activeMoleHole !== null || state.activeMoleHole2 !== null) return;
-
-    if (state.isGameOver) return;
-
-
-
-    // 清空状态
-
-    state.activeMoleHole = null;
-
-    state.activeMoleHole2 = null;
-
-
-
-    // 随机生成
-
-    spawnMole(1);
-
-    
-
-    // 如果有橡皮擦，生成第二个
-
-    if (state.upgrades.eraser > 0) {
-
-        spawnMole(2);
-
-    }
-
-}
-
-
-
-// 2. 封装生成函数
-
-function spawnMole(slot) {
-
-    let randomIndex;
-
-    do {
-
-        randomIndex = Math.floor(Math.random() * 25);
-
-    } while (randomIndex === (slot === 1 ? state.activeMoleHole2 : state.activeMoleHole));
-
-
-
-    if (slot === 1) state.activeMoleHole = randomIndex;
-
-    else state.activeMoleHole2 = randomIndex;
-
-
-
-    const hole = holes[randomIndex];
-
-    const moleImg = hole.querySelector('.mole');
-
-    
-
-    // --- 实时概率计算 ---
-
-    const rand = Math.random();
-
-    
-
-    // 1. 坏地鼠：基础 0.10，每级剪刀 -0.5%
-
-    const badProb = Math.max(0, 0.10 - (state.upgrades.scissors * 0.005));
-
-    
-
-    // 2. 医生：购买后 1%，没买为 0
-
-    const doctorProb = state.upgrades.doctor > 0 ? 0.006 : 0;
-
-    
-
-let type = 'good';
-
-    if (rand < badProb) {
-
-        type = 'bad';
-
-    } else if (rand < badProb + doctorProb) {
-
-        type = 'doctor';
-
-    } else {
-
-        type = 'good';
-
-        // 【新增 1】检查是否有“闪闪发光...”的升级，并进行概率判定
-
-        if (state.upgrades.shiny > 0) {
-
-            // 根据商店描述，每级增加 2% 的发光概率
-
-            const shinyProb = state.upgrades.shiny * 0.02; 
-
-            if (Math.random() < shinyProb) {
-
-                type = 'shiny';
-
-            }
-
-        }
-
-    }
-
-    // -------------------
-
-
-
-    moleImg.src = type === 'bad' ? 'assets/liuhai.png' : (type === 'doctor' ? 'assets/moyi.png' : 'assets/mb.png');
-
-    moleImg.dataset.type = type;
-
-
-
-    // 【新增 2】清空上一次可能残留的滤镜，防止普通地鼠也跟着发光
-
-    moleImg.style.filter = '';
-
-
-
-    // 【新增 3】如果是发光地鼠，用纯代码（CSS滤镜）直接拉满发光特效！
-
-    if (type === 'shiny') {
-
-        // drop-shadow 营造霓虹外发光，brightness 和 contrast 让整体色彩更亮更具冲击力
-
-        moleImg.style.filter = 'drop-shadow(0 0 20px #ffee55) brightness(1.3) contrast(1.1)';
-
-    }
-
-
-
-moleImg.classList.add('up');
-
-let hit = false;
-
-
-
-const finishMole = () => {
-
-    moleImg.classList.remove('up');
-
-    
-
-    if (slot === 1) state.activeMoleHole = null;
-
-    else state.activeMoleHole2 = null;
-
-
-
-    // 只有当两个槽位都空时，再尝试进行下一步
-
-    if (state.activeMoleHole === null && state.activeMoleHole2 === null) {
-
-        
-
-        // 核心改动：用一个共同的逻辑处理下一步
-
-        const attemptNext = () => {
-
-            // 【关键锁】只要游戏结束，绝对不执行 nextMole
-
-            if (state.isGameOver) return;
-
-            nextMole();
-
+        // ================= 游戏配置与状态 =================
+        const CONFIG = {
+            totalGameTime: 20,
+            baseRate: 1300,
+            badMoleProb: 0.1,
+            moleAnimTime: 80,
         };
 
-
-
-        const fallback = setTimeout(attemptNext, 250); // 稍微延长一点点兜底时间更安全
-
-
-
-        moleImg.addEventListener('transitionend', () => {
-
-            clearTimeout(fallback);
-
-            attemptNext();
-
-        }, { once: true });
-
-    }
-
-};
-
-// 绑定点击
-
-    moleImg.onpointerdown = (e) => {
-
-        e.stopPropagation();
-
-        if (hit) return;
-
-        hit = true;
-
-        handleHit(type, e.clientX, e.clientY);
-
-        finishMole(); // 击中后执行收尾
-
-    };
-
-
-
-// 自动缩回计时器
-
-    let duration = CONFIG.baseRate
-
-    if (type === 'bad') duration = 750;
-
-
-
-// 【修复4】把每个地鼠的定时器都存进数组
-
-state.moleTimeouts.push(setTimeout(() => {
-
-    if (state.isGameOver) return;
-
-    if (!hit) {
-
-        if (type !== 'bad' && type !== 'doctor') takeDamage();
-
-        finishMole();
-
-    }
-
-}, duration));
-
-}
-
-    holes.forEach(h => {
-
-        h.onpointerdown = (e) => {
-
-            if (e.target === h && !state.isGameOver) {
-
-                e.stopPropagation();
-
-                playSFX('cuo.mp3');
-
-                takeDamage();
-
-            }
-
+        // 成就文案映射
+        const ACHIEVEMENT_DESC = {
+            thinker: '我们或许应该开始游戏了...！',
+            // 2-5 无文案，留空
+            high_100: '你十分厉害，但还是不够...',
+            high_150: '你还是需要更多实力来证明自己',
+            high_40_nobuy: '这次我承认你真的十分厉害了',
+            angel_alt: '这确实是个好思路，但其实不是这样...',
+            dance_50: '使生命的灯火摇曳起来吧——',
+            golden_blast: '对...就是这样！',
+            addiction: '记得喝水',
+            replay1: '重生后 再次 登上舞台',
+            namida: '该斩断的是仇恨啊！',
+            tuqu: '你是懂享受土曲的',
+            // 喵 无文案
+            replay2: '去演绎你的下一代吧',
+            pink_fan: '残念！罰点！あっかんべ！',
+            speed600: '净化灵魂 归于死亡'
         };
 
-    });
+        let state = {
+            hp: 4,
+            score: 100000,
+            combo: 0,
+            molesHit: 0,
+            currentTime: 0,
+            isGameOver: true,
+            currentSpeedScale: 1.0,
+            isUmnosUsed: false,
+            startTime: null,
+            speedrunTime: 0,
+            is92Used: false,
+            isDoctorActive: false,
+            moleTimeouts: [],
+            activeMoleHole2: null,
+            activeMoleHole: null,
+            angel92Unlocked: false,
+            allAchievementsCelebrated: false,
+            isAngel92Active: false,
+            globalMultiplier: 1.0,
+            darlingRemaining: 0,
+            upgrades: {
+                nianwei: 0, umnos: 0, darling: 0, angel92: 0, scissors: 0,
+                shiny: 0, birth: 0, taste: 0, aim: 0, doctor: 0, pink: 0, 
+                birthLonging: 0,  dance: 0, eraser: 0, two_year_celebration: 0
+            },
+            // 成就统计
+            totalGoodHits: 0,
+            totalBadHits: 0,
+            maxComboEver: 0,
+            longestGameTime: 0,
+            gameStartTimestamp: null,
+            tutorialClosed: false,
+            catClicked: false,
+            hitShinyCrit: false,
+            namidaHit: false,
+            restartCount: 0,
+            idleSeconds: 0,          
+            achievements: [
+                { id: 'thinker', name: '思冥者', desc: '???', unlocked: false, claimed: false, condition: '开局5分钟不点击开始', reward: '每5秒获得1积分（不受乘区影响）' },
+                { id: 'mb_cook', name: 'mb厨子', desc: '???', unlocked: false, claimed: false, condition: '总共敲击100只mb', reward: 'mb基础分值+5%' },
+                { id: 'mb_crazy', name: 'mb狂热厨子', desc: '???', unlocked: false, claimed: false, condition: '总共敲击1000只mb', reward: 'mb基础分值+5%' },
+                { id: 'bad_cook', name: '刘海厨子', desc: '???', unlocked: false, claimed: false, condition: '总共敲击20只刘海', reward: '刘海也给你1分' },
+                { id: 'bad_crazy', name: '狂热刘海厨子', desc: '???', unlocked: false, claimed: false, condition: '总共敲击50只刘海', reward: '刘海给你2分' },
+                { id: 'high_100', name: '高玩', desc: '???', unlocked: false, claimed: false, condition: '做到满100个...', reward: '廿未效能+2%' },
+                { id: 'high_150', name: '真正的高玩？', desc: '???', unlocked: false, claimed: false, condition: '做到满150个...', reward: '廿未效能+3%' },
+                { id: 'high_40_nobuy', name: '真正的高玩。', desc: '???', unlocked: false, claimed: false, condition: '不购买任何升级，做到满40个...', reward: '廿未效能+5%' },
+                { id: 'angel_alt', name: '另类的天使', desc: '???', unlocked: false, claimed: false, condition: '满92个...时结束游戏', reward: '揭示天使92解锁方法' },
+                { id: 'dance_50', name: '舞动不止', desc: '???', unlocked: false, claimed: false, condition: '最大秒数到达100s', reward: '生命之舞+0.333s' },
+                { id: 'golden_blast', name: '金暴！', desc: '???', unlocked: false, claimed: false, condition: '暴击一个闪闪发光的mb', reward: '发光与暴击概率+5%' },
+                { id: 'addiction', name: '成瘾性', desc: '???', unlocked: false, claimed: false, condition: '单次游玩超过3000秒', reward: '获得不脱水的身体（如果你照着我说的做的话）' },
+                { id: 'replay1', name: '再演', desc: '???', unlocked: false, claimed: false, condition: '点击再玩一次', reward: '直接获得1000积分' },
+                { id: 'namida', name: 'NAMIDA？！', desc: '???', unlocked: false, claimed: false, condition: '敲打中NAMIDA（0.05%概率）', reward: '神奇剪刀效能+50%' },
+                { id: 'tuqu', name: '土曲享受者', desc: '???', unlocked: false, claimed: false, condition: '将音量和音效拉到最大', reward: '全局积分+1%（乘算）' },
+                { id: 'cat', name: '喵', desc: '???', unlocked: false, claimed: false, condition: '点击左下角的喵', reward: '全局积分+1%（乘算）' },
+                { id: 'replay2', name: '再再演', desc: '???', unlocked: false, claimed: false, condition: '第二次点击再玩一次', reward: '直接获得4000积分' },
+                { id: 'pink_fan', name: '粉厨', desc: '???', unlocked: false, claimed: false, condition: '将Pink升级至满级', reward: 'Pink效能+0.1%' },
+                { id: 'speed600', name: '即刻轮回', desc: '???', unlocked: false, claimed: false, condition: '600s内通关（购买???）', reward: '刘海回弹速率+30%' }
+            ]
+        };
 
+        // ================= 商店数据 =================
+        const SHOP_ITEMS = [
+            { id: 'nianwei',      name: '廿未',       icon: 'assets/nianwei.png',     prices: [25, 350, 2500], max: 3, sfx: 'nianwei.mp3' },
+            { id: 'birthLonging', name: '渴望诞生',   icon: 'assets/umtgr.png',      prices: [200, 800, 1600, 2800, 5000], max: 5, sfx: 'longing.mp3' },
+            { id: 'umnos',       name: '重新分娩',   icon: 'assets/umnos.png',      prices: [500], max: 1, sfx: 'umnos2.mp3' },
+            { id: 'darling',     name: '亲爱的',     icon: 'assets/darling.png',    prices: [150, 900, 3000], max: 3, sfx: 'darling2.mp3' },
+            { id: 'scissors',    name: '神奇剪刀',   icon: 'assets/shibaizuo.png', prices: [100, 200, 350, 500, 750, 1000, 1250, 1500, 2000, 3000], max: 10, sfx: 'scissors.mp3' },
+            { id: 'shiny',       name: '闪闪发光的...', icon: 'assets/faguang.png',  prices: [800, 1700, 2400, 3000, 3500], max: 5, sfx: 'shiny.mp3' },
+            { id: 'birth',       name: '诞生之前',   icon: 'assets/danqian.png',    prices: [100, 200, 350, 500, 750, 1000, 1250, 1500, 2000, 3000], max: 10, sfx: 'birth.mp3' },
+            { id: 'taste',       name: '美之味',     icon: 'assets/mzw.png',        prices: [7000, 1500, 2400, 3000, 5000], max: 5, sfx: 'taste.mp3' },
+            { id: 'aim',         name: '高位瞄准',   icon: 'assets/imh.png',        prices: [600, 1000, 1500, 2000, 4000], max: 5, sfx: 'aim.mp3' },
+            { id: 'angel92',     name: '天使92',     icon: 'assets/92.png',         prices: [0], max: 1, special: true, sfx: 'angel.mp3' },
+            { id: 'doctor',      name: '魔法医生',   icon: 'assets/moyi.png',       prices: [6666], max: 1, sfx: 'doctor.mp3' },
+            { id: 'pink',        name: 'Pink',       icon: 'assets/pink.png',       max: 50, sfx: 'pink.mp3', prices: Array.from({length: 50}, (_, i) => Math.floor(15 * Math.pow(1.18, i))) },
+            { id: 'dance',       name: '生命之舞',   icon: 'assets/mw.png',         prices: [100, 300, 700, 1000, 2000, 3000, 5000], max: 7, sfx: 'dance.mp3' },
+            { id: 'eraser',      name: '少女橡皮擦', icon: 'assets/xpc.png',        prices: [555], max: 1, sfx: 'eraser.mp3' },
+            { id: 'two_year_celebration', name: '???', icon: 'assets/mrttt.png', prices: [100000], max: 1},
+        ];
 
-
-function handleHit(type, x, y) {
-
-        if (type === 'bad') {
-
-            playSFX('cuo.mp3');
-
-            takeDamage();
-
-        } 
-
-        // --- 新增：捕捉魔法医生 ---
-
-else if (type === 'doctor') {
-
-            playSFX('magic.mp3'); 
-
-            showFloatingText("医医医医生...我的病还能治好吗？！！（积分x5）", x, y);
-
-
-
-            const container = document.getElementById('main-container');
-
-            container.classList.add('poison-mushroom-active');
-
-            
-
-            // 激活加成状态
-
-            state.isDoctorActive = true; 
-
-            
-
-            clearTimeout(window.mushroomTimer); 
-
-            window.mushroomTimer = setTimeout(() => {
-
-                container.classList.remove('poison-mushroom-active');
-
-                
-
-                // 关键点：在这里重置状态！
-
-                state.isDoctorActive = false; 
-
-                
-
-                showFloatingText("...正常了...？", window.innerWidth/2, window.innerHeight/2);
-
-            }, 8000);
-
-            
-
-            state.molesHit++;
-
-            state.combo++; 
-
+        // ================= 网格初始化 =================
+        const grid = document.getElementById('grid');
+        for (let i = 0; i < 25; i++) {
+            const hole = document.createElement('div');
+            hole.className = 'hole';
+            hole.dataset.index = i;
+            const mole = document.createElement('img');
+            mole.className = 'mole';
+            hole.appendChild(mole);
+            grid.appendChild(hole);
         }
 
-        // -------------------------
+        const holes = document.querySelectorAll('.hole');
+        const hpImg = document.getElementById('hp-img');
+        const scoreDisp = document.getElementById('score-display');
+        const ctrlBtn = document.getElementById('ctrl-btn');
+        const timerDisp = document.getElementById('timer-display');
+        const speedrunTimer = document.getElementById('speedrun-timer');
+        
+        let timeLoop;
+        let speedrunInterval;
 
-        else {
-
-            playSFX('zhong.mp3');
-
-            state.molesHit++;
-
-            state.combo++;
-
-
-
-// --- 新增：生命之舞逻辑 ---
-
-    if (state.upgrades.dance > 0) {
-
-        const chance = state.upgrades.dance * 0.04;
-
-        if (Math.random() < chance) {
-
-            CONFIG.totalGameTime += 1; // 增加最大时间限制
-
-            showFloatingText("+1s", x, y - 40);
-
+        // ================= 成就系统 =================
+        function getAchievementById(id) {
+            return state.achievements.find(a => a.id === id);
         }
 
+        function renderAchievements() {
+            const container = document.getElementById('achievement-list');
+            container.innerHTML = state.achievements.map(a => {
+                 let statusText = '';
+                if (a.unlocked) {
+                    if (a.desc && a.desc !== '???') {
+                        statusText = a.desc;
+                    }
+                    // 若 desc 为空或''，则 statusText 为空，下面不显示
+                } else {
+                    statusText = '???';
+                }
+                let btnDisabled = !a.unlocked || a.claimed;
+                let btnText = a.claimed ? '已领' : (a.unlocked ? '领取' : '未解锁');
+                let btnClass = (a.unlocked && !a.claimed) ? 'enabled' : '';
+
+                // 未解锁时隐藏条件和奖励
+                let conditionLine = '';
+                let rewardLine = '';
+                if (a.unlocked || a.claimed) {
+                    conditionLine = `<div style="font-size:13px; color:#bbb; margin-top:4px;">完成条件：${a.condition || ''}</div>`;
+                    rewardLine = `<div style="font-size:11px; color:#f1c40f; margin-top:2px;">奖励：${a.reward || ''}</div>`;
+                }
+
+                return `<div class="ach-item">
+                    <div style="flex:1;">
+                   <div style="font-weight:bold; color:#ccc; font-size:14px;">${a.id === 'cat' && !a.unlocked ? '???' : a.name}</div>
+                        ${conditionLine}
+                        ${rewardLine}
+                        ${statusText ? `<div style="font-size:11px; color:#666; margin-top:4px;">${statusText}</div>` : ''}
+                    </div>
+                    <button class="ach-claim-btn ${btnClass}" 
+                            ${btnDisabled ? 'disabled' : ''} 
+                            onclick="claimAchievement('${a.id}')"
+                            style="flex-shrink:0; margin-left:8px;">${btnText}</button>
+                </div>`;
+            }).join('');
+        }
+
+function claimAchievement(id) {
+    const ach = getAchievementById(id);
+    if (!ach || !ach.unlocked || ach.claimed) return;
+    ach.claimed = true;
+    switch (id) {
+        case 'replay1': state.score += 1000; updateUI(); break;
+        case 'replay2': state.score += 4000; updateUI(); break;
+        case 'angel_alt': 
+            alert("天使92解锁条件：让你的分数刚好等于92分（游戏结束时）。");
+            break;
     }
+    renderAchievements();
+    initShop();   // 新增：刷新商店，使成就加成立即生效
+    showFloatingText("奖励已领取！", window.innerWidth / 2, window.innerHeight / 2);
+    if (state.achievements.every(a => a.claimed)) {
+        showCelebration(false);
+    }
+}
 
-
-
-            let gain = 1.0; 
-
-            gain *= state.globalMultiplier;
-
-
-
-            showFloatingText(`满${state.combo}个...`, x, y);
-
-
-
-            if (state.upgrades.pink > 0) {
-
-                gain *= Math.pow(1.15, state.upgrades.pink);
-
-            }
-
-
-
-            // 廿未升级逻辑：连击超过20/40/60... 累计增加
-
-            if (state.upgrades.nianwei > 0 && state.combo >= 20) {
-
-                const step = Math.floor(state.combo / 20); // 连击阶段
-
-                const bonusPerStep = state.upgrades.nianwei * 0.5; // 每阶段加成(50% * 等级)
-
-                gain *= (1.0 + (step * bonusPerStep));
-
-            }
-
-            
-
-            if (type === 'shiny') gain *= 6.0;
-
-
-
-            if (Math.random() < (state.upgrades.aim * 0.02)) {
-
-                gain *= 3.0;
-
-                // 💡 视觉反馈：文案更具冲击力
-
-                showFloatingText("I'M HIGH!!!", x, y + 20); 
-
-    
-
-  // 💡 听觉反馈：增加暴击专属音效 (建议文件名: crit.mp3)
-
-                playSFX('crit.mp3');
-
-
-
-            }
-
-
-
-            if (state.isDoctorActive) gain *= 6.0;
-
-            state.score += gain; 
-
-            
-
-            const needed = 40 - (state.upgrades.taste * 3);
-
-            if (state.molesHit % needed === 0 && state.hp < 4) {
-
-                state.hp++;
-
-                updateUI();
-
-            }
-
+        function unlockAchievement(id) {
+            const ach = getAchievementById(id);
+            if (!ach || ach.unlocked) return;
+            ach.unlocked = true;
+            ach.desc = ACHIEVEMENT_DESC[id] || '';   // 没有文案就空
+            showFloatingText(`成就解锁：${ach.name}`, window.innerWidth/2, window.innerHeight/2);
+            renderAchievements();
         }
 
-        updateUI();
+        function checkAchievements() {
+            // 累计
+            if (state.totalGoodHits >= 100) unlockAchievement('mb_cook');
+            if (state.totalGoodHits >= 1000) unlockAchievement('mb_crazy');
+            if (state.totalBadHits >= 20) unlockAchievement('bad_cook');
+            if (state.totalBadHits >= 50) unlockAchievement('bad_crazy');
+            // 连击
+            if (state.maxComboEver >= 100) unlockAchievement('high_100');
+            if (state.maxComboEver >= 150) unlockAchievement('high_150');
+            if (state.maxComboEver >= 40 && Object.values(state.upgrades).every(v => v === 0)) unlockAchievement('high_40_nobuy');
+            // 其他
+            if (CONFIG.totalGameTime >= 100) unlockAchievement('dance_50');
+            if (state.hitShinyCrit) unlockAchievement('golden_blast');
+            if (audioSettings.bgmVolume >= 1 && audioSettings.sfxVolume >= 1) unlockAchievement('tuqu');
+            if (state.catClicked) unlockAchievement('cat');
+            if (state.namidaHit) unlockAchievement('namida');
+            if (state.upgrades.pink >= 50) unlockAchievement('pink_fan');
+            // 再演/再再演 由 handleRestart 触发
+            // 即刻轮回 由 buyItem 触发
+            renderAchievements();
+        }
 
-    }
+        function updateComboAndCheck(combo) {
+            if (combo > state.maxComboEver) {
+                state.maxComboEver = combo;
+                checkAchievements();
+            }
+        }
+
+        function startThinkerTimer() {
+            let lastTick = Date.now();
+            setInterval(() => {
+                const ach = getAchievementById('thinker');
+                if (!ach) return;
+                // 已领取：每5秒加1分
+                if (ach.claimed) {
+                    state.score += 1;
+                    updateUI();
+                }
+                // 未解锁且处于主界面（tutorialClosed + isGameOver）时，累计挂机秒数
+                if (!ach.unlocked && state.tutorialClosed && state.isGameOver) {
+                    const now = Date.now();
+                    state.idleSeconds += (now - lastTick) / 1000;
+                    if (state.idleSeconds >= 300) {
+                        ach.unlocked = true;
+                        ach.desc = ACHIEVEMENT_DESC.thinker;
+                        showFloatingText("成就解锁：思冥者", window.innerWidth/2, window.innerHeight/2);
+                        renderAchievements();
+                    }
+                }
+                lastTick = Date.now();
+            }, 5000);
+        }
+
+        function handleRestart() {
+            state.idleSeconds = 0;
+            state.restartCount++;
+            if (state.restartCount === 1) unlockAchievement('replay1');
+            else if (state.restartCount === 2) unlockAchievement('replay2');
+            checkAchievements();
+
+            // 移除通关界面
+            const overlay = document.querySelector('#shop-area + div') || document.querySelector('body > div:last-child');
+            if (overlay && overlay.style && overlay.style.position === 'fixed') {
+                overlay.remove();
+            }
+            state.tutorialClosed = false;
+            document.getElementById('cat-icon').style.display = 'block'; // 确保喵可见
+            cancelAnimationFrame(speedrunInterval); // 清除旧计时器
+            state.startTime = Date.now();
+            startSpeedrunLoop();
+            // 更可靠的方式：直接查找并删除 celebration 的 div
+            const allDivs = document.querySelectorAll('body > div');
+            allDivs.forEach(d => {
+                if (d.style.position === 'fixed' && d.style.zIndex === '9999') {
+                    d.remove();
+                }
+            });
+
+            // 重置游戏数据（保留成就、统计、升级）
+            state.hp = 4;
+            state.score = 0;          // 积分清零
+            state.combo = 0;
+            state.molesHit = 0;
+            state.currentTime = 0;
+            state.isGameOver = true;
+            state.isUmnosUsed = false;
+            state.is92Used = false;
+            state.isDoctorActive = false;
+            state.moleTimeouts.forEach(clearTimeout);
+            state.moleTimeouts = [];
+            state.activeMoleHole = null;
+            state.activeMoleHole2 = null;
+            state.angel92Unlocked = false;
+            state.isAngel92Active = false;
+            state.globalMultiplier = 1.0;
+            // 重置升级项
+            Object.keys(state.upgrades).forEach(k => { state.upgrades[k] = 0; });
+            // 重置局内统计（不影响成就累计统计）
+            state.maxComboEver = 0;
+            state.longestGameTime = 0;
+            state.hitShinyCrit = false;
+            state.namidaHit = false;
+            state.totalGoodHits = 0;
+            state.totalBadHits = 0;
+
+            clearInterval(timeLoop);
 
 
-
-function takeDamage() {
-
-        if (state.isGameOver) return;
-
-        // 只要有保护就触发，不需要 combo > 0 的限制
-
-        if (state.upgrades.darling > 0) {
-
-            state.upgrades.darling--; 
-
-            playSFX('ball.mp3');
-
-            showFloatingText("这种事我没有听说过啊！", window.innerWidth/2, window.innerHeight/2);
-
+            document.querySelectorAll('.mole').forEach(m => { m.classList.remove('up'); m.style.cssText = ''; });
+            updateUI();
+            timerDisp.style.visibility = 'hidden';
+            ctrlBtn.style.visibility = 'visible';
+            ctrlBtn.disabled = false;
+            ctrlBtn.style.opacity = '1';
+            ctrlBtn.innerText = '开始游戏';
             initShop();
-
-            return; // 保护生效，直接退出，不扣血也不清空连击
-
+            renderAchievements();
+            scoreDisp.style.color = '#fff';
         }
 
+        // ================= 教程关闭 =================
+        function closeTutorial() {
+            document.getElementById('tutorial-overlay').style.display = 'none';
+            state.startTime = Date.now();
+            state.tutorialClosed = true;
+            startSpeedrunLoop();
+            document.getElementById('cat-icon').style.display = 'block';
+            startThinkerTimer();
+        }
 
+        document.getElementById('cat-icon').onclick = () => {
+            playSFX('cat.mp3');
+            if (!state.catClicked) {
+                state.catClicked = true;
+                checkAchievements();
+            }
+        };
 
-        // 只有没保护时才走到这里
+        // ================= 商店描述 =================
+function getItemDesc(id, lv) {
+    const yellowSpan = (num) => `<span style="color:yellow">${num}</span>`;
+    const cyanSpan = (num) => `<span style="color:lightblue">${num}</span>`;
 
-        state.hp--;
+    const formatNum = (num) => Number.isInteger(num) ? num : num.toFixed(1);
 
-        state.combo = 0; // 【这里才是清空连击的地方！】
+    switch(id) {
+        case 'nianwei': {
+            let basePercent = (lv || 1) * 40;
+            let extraPercent = 0;
+            const hasHigh100 = getAchievementById('high_100')?.claimed;
+            const hasHigh150 = getAchievementById('high_150')?.claimed;
+            const hasHigh40 = getAchievementById('high_40_nobuy')?.claimed;
+            if (hasHigh100) extraPercent += 2;
+            if (hasHigh150) extraPercent += 3;
+            if (hasHigh40) extraPercent += 5;
+            const totalPercent = basePercent + extraPercent;
+            const displayPercent = formatNum(totalPercent);
+            const isEffected = hasHigh100 || hasHigh150 || hasHigh40;
+            return `每满${yellowSpan(20)}个...，积分就会增加${isEffected ? cyanSpan(displayPercent) : yellowSpan(displayPercent)}%（可无限叠加哦！）`;
+        }
+        case 'birthLonging':
+            return `一开始他就可以满${yellowSpan((lv*15)||15)}个...`;
+        case 'scissors': {
+            let baseBonus = (lv || 1) * 5;
+            const hasNamida = getAchievementById('namida')?.claimed;
+            if (hasNamida) baseBonus *= 1.5;
+            const displayBonus = formatNum(baseBonus);
+            return `能够剪掉${hasNamida ? cyanSpan(displayBonus) : yellowSpan(displayBonus)}%个刘海（什么！？）`;
+        }
+        case 'umnos':
+            return `获得一次“重生”的机会（大概）`;
+        case 'darling':
+            return `Darling会保护你${yellowSpan(lv||1)}次`;
+        case 'angel92':
+            return (Math.floor(state.score) === 92 || state.upgrades.angel92 > 0) 
+                ? `⁽⁽ଘ( ˊᵕˋ )ଓ⁾⁾*：天使の数字会让你“积分翻倍！”` 
+                : `未解锁：这个东西需要满足一些东西才能购买...`;
+        case 'shiny': {
+            let prob = (lv || 1) * 2;
+            const hasGolden = getAchievementById('golden_blast')?.claimed;
+            if (hasGolden) prob += 5;
+            const displayProb = formatNum(prob);
+            return `Mind Brand们现在有${hasGolden ? cyanSpan(displayProb) : yellowSpan(displayProb)}%的概率变为闪闪发光的，积分+600%`;
+        }
+        case 'birth':
+            return `让你从负${yellowSpan((lv||1)*3)}秒时开始游戏`;
+        case 'taste':
+            return `你现在可以吃掉她...每${yellowSpan(40 - (lv*3))}个能让你回复血量`;
+        case 'aim': {
+            let critProb = (lv || 1) * 2;
+            const hasGolden = getAchievementById('golden_blast')?.claimed;
+            if (hasGolden) critProb += 5;
+            const displayCrit = formatNum(critProb);
+            return `你现在有${hasGolden ? cyanSpan(displayCrit) : yellowSpan(displayCrit)}%的概率暴击，获得300%积分  I'm(≧A≦)HIGH!!!`;
+        }
+        case 'doctor':
+            return `<span style="color:red">购买后或许会有不太好的事情发生...</span>`;
+        case 'pink': {
+            let baseMult = 1.10;
+            const hasPinkFan = getAchievementById('pink_fan')?.claimed;
+            if (hasPinkFan) baseMult += 0.001;
+            const totalBonus = (Math.pow(baseMult, lv) - 1) * 100;
+            const displayBonus = formatNum(totalBonus);
+            return `你好！我能让Mind Brand的价值+10%（乘算哦!!）。当前总加成: ${hasPinkFan ? cyanSpan(displayBonus) : yellowSpan(displayBonus)}%`;
+        }
+        case 'dance': {
+            const chance = (lv || 1) * 4;
+            let extraSeconds = 1;
+            const hasDance50 = getAchievementById('dance_50')?.claimed;
+            if (hasDance50) extraSeconds += 0.333;
+            const displayChance = formatNum(chance);
+            const displayExtra = formatNum(extraSeconds);
+            // 概率不受成就影响，始终黄色；额外秒数受成就影响，变色
+            return `生命之舞会让你每次敲打Mind Brand后有 ${yellowSpan(displayChance)}% 概率+${hasDance50 ? cyanSpan(displayExtra) : yellowSpan(displayExtra)}s ^_^`;
+        }
+        case 'eraser':
+            return `橡皮擦会帮你擦出来一个全新的Mind Brand！`;
+        case 'two_year_celebration':
+            return `???`;
+        default:
+            return '';
+    }
+}
+        function initShop() {
+            try {
+                const list = document.getElementById('shop-list');
+                const normalItems = SHOP_ITEMS.filter(i => 
+                    !i.special && i.id !== 'doctor' && i.id !== 'two_year_celebration'
+                ).sort((a,b) => {
+                    const priceA = state.upgrades[a.id] >= a.max ? Infinity : a.prices[state.upgrades[a.id]];
+                    const priceB = state.upgrades[b.id] >= b.max ? Infinity : b.prices[state.upgrades[b.id]];
+                    return priceA - priceB;
+                });
+                const angelItem = SHOP_ITEMS.find(i => i.id === 'angel92');
+                const doctorItem = SHOP_ITEMS.find(i => i.id === 'doctor');
+                const celebrationItem = SHOP_ITEMS.find(i => i.id === 'two_year_celebration');
+                const finalItems = [...normalItems, angelItem, doctorItem, celebrationItem];
 
-        
+                list.innerHTML = finalItems.map(item => {
+                const disabledDuringGame = !state.isGameOver ? 'disabled' : '';
+                    if (!item) return '';
+                    const curLv = state.upgrades[item.id] || 0;
+                    const maxed = curLv >= item.max;
+                    const price = item.prices ? item.prices[curLv] : 0;
+                    const canAfford = state.score >= price;
+                    const is92Locked = item.id === 'angel92' && state.upgrades.angel92 === 0 && Math.floor(state.score) !== 92;
+                    const gameActive = !state.isGameOver; // 游戏中则为 true
+                    let btnHtml = '';
+                    if (item.id === 'two_year_celebration') {
+                        btnHtml = `<button class="buy-btn ${state.score >= 100000 ? 'can-buy':''}" onclick="buyItem('two_year_celebration')">购买</button>`;
+                    } else if (!item.special || (item.id === 'angel92' && !is92Locked)) {
+                        if (!maxed) {
+                            btnHtml = `<button class="buy-btn ${canAfford && state.isGameOver ? 'can-buy':''}" ${disabledDuringGame} onclick="buyItem('${item.id}')">${curLv === 0 ? '购买' : '升级'}</button>`;
+                        } else {
+                            btnHtml = `<button class="buy-btn" disabled style="opacity:0.5; cursor:not-allowed;">满级</button>`;
+                        }
+                    }
 
-        hpImg.classList.add('shake');
+                    return `
+                        <div class="shop-item ${is92Locked ? 'locked' : ''}" id="item-${item.id}">
+                            <img src="${item.icon}" class="item-icon">
+                            <div class="item-info">
+                                <div class="item-name">${item.name} ${item.max > 1 ? `<span style="color:#2ecc71">Lv.${curLv}</span>` : ''}</div>
+                                <div class="item-desc">${getItemDesc(item.id, curLv)}</div>
+                                <div class="item-price">${is92Locked ? '条件未达成' : (maxed ? 'MAX' : '价格: ' + price)}</div>
+                            </div>
+                            ${btnHtml}
+                        </div>
+                    `;
+                }).join('');
+                console.log('商店渲染完成');
+            } catch (e) {
+                console.error('initShop 出错:', e);
+            }
+        }
 
-        setTimeout(() => hpImg.classList.remove('shake'), 350);
-
-        
-
-        if (state.hp <= 0) {
-
-            if (state.upgrades.umnos > 0 && !state.isUmnosUsed) {
-
-                triggerUmnos();
-
-            } else {
-
-                gameOver();
-
+        // ================= 购买逻辑 =================
+        function buyItem(id) {
+            if (!state.isGameOver) {
+                showFloatingText("先好好打mb", window.innerWidth/2, window.innerHeight/2);
+                return;
+            }
+            const item = SHOP_ITEMS.find(i => i.id === id);
+            if (id === 'two_year_celebration') {
+                if (state.score >= 100000) {
+                    cancelAnimationFrame(speedrunInterval);
+                    state.score -= 100000;
+                    if (state.startTime) {
+                        const timeDiff = Date.now() - state.startTime;
+                        state.speedrunTime = (timeDiff / 1000).toFixed(2);
+                    }
+                    if (parseFloat(state.speedrunTime) <= 600) unlockAchievement('speed600');
+                    triggerTwoYearCelebration();
+                } else {
+                    showFloatingText("积分不足...", window.innerWidth/2, window.innerHeight/2);
+                }
+                return;
             }
 
+            const curLv = state.upgrades[id];
+            const price = item.prices[curLv];
+            if (curLv < item.max && state.score >= price) {
+                if (id === 'doctor') {
+                    document.getElementById('doctor-modal').style.display = 'flex';
+                    return;
+                }
+                if (item.sfx) playSFX(item.sfx);
+                else playSFX('default_buy.mp3');
+                state.score -= price;
+                state.upgrades[id]++;
+                updateUI();
+                initShop();
+                checkAchievements();
+            }
         }
 
-        updateUI();
+        function confirmDoctor(yes) {
+            document.getElementById('doctor-modal').style.display = 'none';
+            if (yes) {
+                const price = 666;
+                if (state.score >= price) {
+                    state.score -= price;
+                    state.upgrades.doctor = 1;
+                    state.isDoctorActive = true;
+                    document.body.classList.add('distort-active');
+                    setTimeout(() => document.body.classList.remove('distort-active'), 500);
+                    playSFX('doctor.mp3');
+                    showFloatingText("正在进行微调...", window.innerWidth/2, window.innerHeight/2);
+                    updateUI();
+                    initShop();
+                }
+            }
+        }
 
+        // ================= 游戏主循环 =================
+        function startGame() {
+            if (!state.isGameOver) return;
+            state.idleSeconds = 0;
+            state.isGameOver = false;
+            CONFIG.totalGameTime = 20; 
+            state.currentTime = - (state.upgrades.birth * 3);
+            state.activeMoleHole = null;
+            state.activeMoleHole2 = null;
+            document.querySelectorAll('.mole').forEach(mole => {
+                mole.classList.remove('up');
+                mole.style.cssText = ''; 
+            });
+            state.hp = 4;
+            state.combo = state.upgrades.birthLonging * 15;
+            state.molesHit = 0;
+            state.isUmnosUsed = false;
+            state.is92Used = false;
+            state.darlingRemaining = state.upgrades.darling;
+            state.isDoctorActive = false;
+            state.currentSpeedScale = 1.0;
+            if (state.upgrades.angel92 > 0) {
+                state.isAngel92Active = true;
+                state.globalMultiplier = 2.0;
+            } else {
+                state.isAngel92Active = false;
+                state.globalMultiplier = 1.0;
+            }
+            bgm.play().catch(e => console.log("等待用户交互后播放"));
+            updateUI();
+            timerDisp.innerText = `${state.currentTime}s/${CONFIG.totalGameTime}s`;
+            timerDisp.style.visibility = 'visible';
+            ctrlBtn.style.visibility = 'hidden';
+            nextMole();
+            timeLoop = setInterval(() => {
+                state.currentTime++;
+                timerDisp.innerText = `${state.currentTime}s/${Math.floor(CONFIG.totalGameTime)}s`;
+                updateComboAndCheck(state.combo);
+                if (state.currentTime >= CONFIG.totalGameTime) {
+                    gameOver();
+                }
+            }, 1000);
+        }
+
+function startSpeedrunLoop() {
+    function step() {
+        if (!state.startTime) return;
+        const elapsed = (Date.now() - state.startTime) / 1000;
+        speedrunTimer.innerText = elapsed.toFixed(2) + 's';
+        if (elapsed >= 3000) unlockAchievement('addiction');
+        speedrunInterval = requestAnimationFrame(step);
     }
+    speedrunInterval = requestAnimationFrame(step);
+}
 
-function triggerUmnos() {
+        function nextMole() {
+            if (state.activeMoleHole !== null || state.activeMoleHole2 !== null) return;
+            if (state.isGameOver) return;
+            state.activeMoleHole = null;
+            state.activeMoleHole2 = null;
+            spawnMole(1);
+            if (state.upgrades.eraser > 0) spawnMole(2);
+        }
 
-        // 1. 彻底冻结游戏状态，防止在复活期间产生额外的点击或地鼠生成
+        function spawnMole(slot) {
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * 25);
+            } while (randomIndex === (slot === 1 ? state.activeMoleHole2 : state.activeMoleHole));
 
-        state.isGameOver = true; 
+            if (slot === 1) state.activeMoleHole = randomIndex;
+            else state.activeMoleHole2 = randomIndex;
 
-        state.isUmnosUsed = true;
+            const hole = holes[randomIndex];
+            const moleImg = hole.querySelector('.mole');
+            const rand = Math.random();
+            
+            let effectiveScissors = state.upgrades.scissors;
+            if (getAchievementById('namida')?.claimed) effectiveScissors *= 1.5;
+            const badProb = Math.max(0, 0.10 - (effectiveScissors * 0.005));
+            const doctorProb = state.upgrades.doctor > 0 ? 0.005 : 0;
+            
+            let type = 'good';
+            if (rand < badProb) {
+                type = 'bad';
+            } else if (rand < badProb + doctorProb) {
+                type = 'doctor';
+            } else {
+                if (!getAchievementById('namida')?.unlocked && Math.random() < 0.0005) {
+                    type = 'namida';
+                } else {
+                    type = 'good';
+                    if (state.upgrades.shiny > 0) {
+                        let shinyProb = state.upgrades.shiny * 0.02;
+                        if (getAchievementById('golden_blast')?.claimed) shinyProb += 0.05;
+                        if (Math.random() < shinyProb) {
+                            type = 'shiny';
+                        }
+                    }
+                }
+            }
 
+            moleImg.src = type === 'namida' ? 'assets/nmd.png' : (type === 'bad' ? 'assets/liuhai.png' : (type === 'doctor' ? 'assets/moyi.png' : 'assets/mb.png'));
+            moleImg.dataset.type = type;
+            moleImg.style.filter = '';
+            if (type === 'shiny') {
+                moleImg.style.filter = 'drop-shadow(0 0 20px #ffee55) brightness(1.3) contrast(1.1)';
+            }
 
+            moleImg.classList.add('up');
+            let hit = false;
 
-// 【修复1】冻结全局时间，防止复活期间时间耗尽
+            const finishMole = () => {
+                moleImg.classList.remove('up');
+                if (slot === 1) state.activeMoleHole = null;
+                else state.activeMoleHole2 = null;
+                if (state.activeMoleHole === null && state.activeMoleHole2 === null) {
+                    const attemptNext = () => {
+                        if (state.isGameOver) return;
+                        nextMole();
+                    };
+                    const fallback = setTimeout(attemptNext, 250);
+                    moleImg.addEventListener('transitionend', () => {
+                        clearTimeout(fallback);
+                        attemptNext();
+                    }, { once: true });
+                }
+            };
 
-    clearInterval(timeLoop);
+            moleImg.onpointerdown = (e) => {
+                e.stopPropagation();
+                if (hit) return;
+                hit = true;
+                handleHit(type, e.clientX, e.clientY);
+                finishMole();
+            };
 
-        
+            let duration = CONFIG.baseRate;
+            if (type === 'bad') {
+                duration = 750;
+                if (getAchievementById('speed600')?.claimed) duration *= 0.7;
+            }
+            state.moleTimeouts.push(setTimeout(() => {
+                if (state.isGameOver) return;
+                if (!hit) {
+                    if (type !== 'bad' && type !== 'doctor') takeDamage();
+                    finishMole();
+                }
+            }, duration));
+        }
 
-        // 2. 清除所有可能的残留计时器，确保游戏逻辑完全暂停
-
-        // 【修复4】清空所有残留的地鼠定时器
-
-state.moleTimeouts.forEach(clearTimeout);
-
-state.moleTimeouts = [];;
-
-        state.currentMoleTimeout = null;
-
-        
-
-        // 3. 清理所有地鼠的视觉状态（强制所有地鼠缩回，避免出现多个地鼠）
-
-        const allMoles = document.querySelectorAll('.mole');
-
-        allMoles.forEach(moleImg => {
-
-            moleImg.classList.remove('up');
-
+        holes.forEach(h => {
+            h.onpointerdown = (e) => {
+                if (e.target === h && !state.isGameOver) {
+                    e.stopPropagation();
+                    playSFX('cuo.mp3');
+                    takeDamage();
+                }
+            };
         });
 
-        
+        function handleHit(type, x, y) {
+            if (type === 'bad') {
+                state.totalBadHits++;
+                checkAchievements();
+                if (getAchievementById('bad_cook')?.claimed) state.score += 1;
+                if (getAchievementById('bad_crazy')?.claimed) state.score += 1;
+                playSFX('cuo.mp3');
+                takeDamage();
+            } else if (type === 'doctor') {
+                playSFX('magic.mp3'); 
+                showFloatingText("医医医医生...我的病还能治好吗？！！（积分x5）", x, y);
+                const container = document.getElementById('main-container');
+                container.classList.add('poison-mushroom-active');
+                state.isDoctorActive = true; 
+                clearTimeout(window.mushroomTimer); 
+                window.mushroomTimer = setTimeout(() => {
+                    container.classList.remove('poison-mushroom-active');
+                    state.isDoctorActive = false; 
+                    showFloatingText("...正常了...？", window.innerWidth/2, window.innerHeight/2);
+                }, 8000);
+                state.molesHit++;
+                state.combo++; 
+            } else if (type === 'namida') {
+                playSFX('namida.mp3');
+                state.namidaHit = true;
+                checkAchievements();
+                showFloatingText("NAMIDA？！", x, y);
+                state.molesHit++;
+                state.combo++;
+                let gain = 1.0;
+                gain *= state.globalMultiplier;
+                if (state.upgrades.pink > 0) {
+                    let pinkMult = 1.10;
+                    if (getAchievementById('pink_fan')?.claimed) pinkMult += 0.001;
+                    gain *= Math.pow(pinkMult, state.upgrades.pink);
+                }
+                if (state.isDoctorActive) gain *= 6.0;
+                if (getAchievementById('tuqu')?.claimed) gain *= 1.01;
+                if (getAchievementById('cat')?.claimed) gain *= 1.01;
+                state.score += gain;
+                updateUI();
+            } else {
+                playSFX('zhong.mp3');
+                state.molesHit++;
+                state.combo++;
+                state.totalGoodHits++;
+                checkAchievements();
 
-        // 4. 清除洞口的阴影效果
+                if (state.upgrades.dance > 0) {
+                    const chance = state.upgrades.dance * 0.04;
+                    if (Math.random() < chance) {
+                        let extraTime = 1;
+                        if (getAchievementById('dance_50')?.claimed) extraTime += 0.333;
+                        CONFIG.totalGameTime += extraTime;
+                        showFloatingText("+1s", x, y - 40);
+                    }
+                }
 
-        holes.forEach(h => h.style.boxShadow = "none");
-
-
-
-        // 5. 显示半透明复活遮罩层 (CSS 已设置为 rgba(0,0,0,0.2))
-
-        const overlay = document.getElementById('umnos-overlay');
-
-        const img = document.getElementById('umnos-img');
-
-        overlay.style.display = 'flex';
-
-        playSFX('umnos.mp3');
-
-
-
-// 6. 显示“你是什么错都没有的！！”提示
-
-// X 直接使用 window.innerWidth / 2，Y 稍微偏上 50px
-
-showFloatingText(
-
-    "你是什么错都没有的！！", 
-
-    window.innerWidth / 2, 
-
-    window.innerHeight / 2 - 50
-
-);
-
-        // 7. 执行复活视觉动画
-
-        setTimeout(() => {
-
-            img.style.transform = 'scale(10)'; // 缩短缩放动画系数
-
-            setTimeout(() => {
-
-                // 动画结束，移除遮罩
-
-                overlay.style.display = 'none';
-
-                img.style.transform = 'scale(1)';
-
+                let gain = 1.0; 
+                if (getAchievementById('mb_cook')?.claimed) gain += 0.05;
+                if (getAchievementById('mb_crazy')?.claimed) gain += 0.05;
+                gain *= state.globalMultiplier;
+                showFloatingText(`满${state.combo}个...`, x, y);
                 
+                if (state.upgrades.pink > 0) {
+                    let pinkMult = 1.10;
+                    if (getAchievementById('pink_fan')?.claimed) pinkMult += 0.001;
+                    gain *= Math.pow(pinkMult, state.upgrades.pink);
+                }
+                if (state.upgrades.nianwei > 0 && state.combo >= 20) {
+                    const step = Math.floor(state.combo / 20);
+                    let bonusPerStep = state.upgrades.nianwei * 0.4;
+                    if (getAchievementById('high_100')?.claimed) bonusPerStep += 0.02;
+                    if (getAchievementById('high_150')?.claimed) bonusPerStep += 0.03;
+                    if (getAchievementById('high_40_nobuy')?.claimed) bonusPerStep += 0.05;
+                    gain *= (1.0 + (step * bonusPerStep));
+                }
+                if (type === 'shiny') gain *= 6.0;
+                
+                let critProb = state.upgrades.aim * 0.02;
+                if (getAchievementById('golden_blast')?.claimed) critProb += 0.05;
+                if (Math.random() < critProb) {
+                    gain *= 3.0;
+                    showFloatingText("I'M HIGH!!!", x, y + 20); 
+                    playSFX('crit.mp3');
+                    if (type === 'shiny') {
+                        state.hitShinyCrit = true;
+                        checkAchievements();
+                    }
+                }
+                if (state.isDoctorActive) gain *= 6.0;
+                
+                if (getAchievementById('tuqu')?.claimed) gain *= 1.01;
+                if (getAchievementById('cat')?.claimed) gain *= 1.01;
+                
+                state.score += gain; 
 
-                // 8. 重置HP并恢复游戏逻辑
+                const needed = 40 - (state.upgrades.taste * 3);
+                if (state.molesHit % needed === 0 && state.hp < 4) {
+                    state.hp++;
+                    updateUI();
+                }
+            }
+            updateUI();
+        }
 
-                state.hp = 1;
+        function takeDamage() {
+            if (state.isGameOver) return;
+if (state.darlingRemaining > 0) {
+    state.darlingRemaining--;
+    playSFX('ball.mp3');
+    showFloatingText("这种事我没有听说过啊！", window.innerWidth/2, window.innerHeight/2);
+    // 无需刷新商店，因为升级等级未变
+    return;
+}
+            state.hp--;
+            state.combo = 0;
+            hpImg.classList.add('shake');
+            setTimeout(() => hpImg.classList.remove('shake'), 350);
+            if (state.hp <= 0) {
+                if (state.upgrades.umnos > 0 && !state.isUmnosUsed) {
+                    triggerUmnos();
+                } else {
+                    gameOver();
+                }
+            }
+            updateUI();
+        }
 
-                state.isGameOver = false;
+        function triggerUmnos() {
+            state.isGameOver = true; 
+            state.isUmnosUsed = true;
+            clearInterval(timeLoop);
+            state.moleTimeouts.forEach(clearTimeout);
+            state.moleTimeouts = [];
+            document.querySelectorAll('.mole').forEach(moleImg => moleImg.classList.remove('up'));
+            const overlay = document.getElementById('umnos-overlay');
+            const img = document.getElementById('umnos-img');
+            overlay.style.display = 'flex';
+            playSFX('umnos.mp3');
+            showFloatingText("你是什么错都没有的！！", window.innerWidth / 2, window.innerHeight / 2 - 50);
+            setTimeout(() => {
+                img.style.transform = 'scale(10)';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    img.style.transform = 'scale(1)';
+                    state.hp = 1;
+                    state.isGameOver = false;
+            state.idleSeconds = 0;   // 进入游戏就清零挂机累计，防止游戏中意外解锁
+                    state.activeMoleHole = null;
+                    state.activeMoleHole2 = null;
+                    timeLoop = setInterval(() => {
+                        state.currentTime++;
+                        timerDisp.innerText = `${state.currentTime}s/${Math.floor(CONFIG.totalGameTime)}s`;
+                        if (state.currentTime >= CONFIG.totalGameTime) {
+                            gameOver();
+                        }
+                    }, 200);
+                    nextMole(); 
+                    updateUI();
+                }, 2000); 
+            }, 100);
+        }
 
-                state.activeMoleHole = null;
+        function gameOver() {
+            ctrlBtn.disabled = true;
+            ctrlBtn.style.opacity = '0.5';
+            playSFX('die.mp3');
+            state.isGameOver = true;
+            clearInterval(timeLoop);
+            state.moleTimeouts.forEach(clearTimeout);
+            state.moleTimeouts = [];
+const finalScore = Math.floor(state.score);
 
-    state.activeMoleHole2 = null;
+// 成就：游戏结束时连击数正好为92
+if (state.combo === 92) {
+    unlockAchievement('angel_alt');
+}
 
+// 商店物品提示：游戏结束时积分正好为92且未获得天使92
+if (finalScore === 92 && state.upgrades.angel92 === 0) {
+    showFloatingText("ଘ( ˊᵕˋ )ଓ 天使92已在商店显现!", window.innerWidth/2, window.innerHeight/2);
+}
+            
+            checkAchievements();
+            timerDisp.style.visibility = 'hidden';
+            ctrlBtn.style.visibility = 'visible';
+            holes.forEach(h => h.querySelector('.mole').classList.remove('up'));
+            initShop();
+            scoreDisp.style.color = 'var(--neon-green)';
+            setTimeout(() => { scoreDisp.style.color = '#fff'; }, 1000);
+            setTimeout(() => {
+                ctrlBtn.style.visibility = 'visible';
+                ctrlBtn.disabled = false;
+                ctrlBtn.style.opacity = '1';
+                ctrlBtn.innerText = "开始游戏";
+            }, 100);
+        }
 
+        function updateUI() {
+            const hpIndex = 5 - state.hp;
+            hpImg.src = `assets/hp${hpIndex}.png`;
+            scoreDisp.innerText = `积分: ${Math.floor(state.score)}`;
+        }
 
-timeLoop = setInterval(() => {
+        function showCelebration(isDevMode) {
+            const old = document.getElementById('celebration-container');
+            if (old) old.remove();
 
-            state.currentTime++;
+            const container = document.createElement('div');
+            container.id = 'celebration-container';
+            container.style.cssText = `
+                position: fixed; inset: 0;
+                background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+                display: flex; flex-direction: column;
+                justify-content: center; align-items: center;
+                z-index: 10000; overflow: hidden;
+            `;
 
-            timerDisp.innerText = `${state.currentTime}s/${CONFIG.totalGameTime}s`;
-
-            if (state.currentTime >= CONFIG.totalGameTime) {
-
-                gameOver();
-
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'celeb-particle';
+                const size = 4 + Math.random() * 8;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.bottom = '-20px';
+                particle.style.background = `hsl(${Math.random() * 60 + 30}, 100%, 70%)`;
+                particle.style.animationDuration = (4 + Math.random() * 6) + 's';
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(particle);
             }
 
-        }, 200);
-
-                
-
-                // 9. 重新开始生成地鼠
-
-                nextMole(); 
-
-                updateUI();
-
-            }, 2000); 
-
-        }, 100);
-
-    }
-
-    function gameOver() {
-
-
-
-// 1. 立即锁定按钮，防止连点
-
-    ctrlBtn.disabled = true;
-
-    ctrlBtn.style.opacity = '0.5';
-
-
-
-    playSFX('die.mp3');
-
-
-
-    state.isGameOver = true;
-
-    clearInterval(timeLoop);
-
-    // 【修复4】清空所有残留的地鼠定时器
-
-state.moleTimeouts.forEach(clearTimeout);
-
-state.moleTimeouts = [];
-
-
-
-// 1. 确保分数计算精准：强制截断小数点，只取整数部分
-
-const finalScore = Math.floor(state.score); 
-
-console.log("游戏结束，整数分数:", finalScore); 
-
-
-
-// 2. 解锁逻辑：使用 Math.floor 后，92.0 到 92.999... 都会被判定为 92
-
-// 只要停在92分且还没买，就提示玩家可以去商店买了（分数变动后将失去机会）
-
-if (finalScore === 92 && state.upgrades.angel92 === 0) {
-
-    showFloatingText("ଘ( ˊᵕˋ )ଓ 天使92已在商店显现!", window.innerWidth/2, window.innerHeight/2);
-
-    console.log("天使92短暂解锁");
-
-}
-
-
-
-    // 3. 将 UI 更新操作放在最后，确保不被中途打断
-
-    timerDisp.style.visibility = 'hidden';
-
-    ctrlBtn.style.visibility = 'visible';
-
-    holes.forEach(h => h.querySelector('.mole').classList.remove('up'));
-
-    
-
-    // 如果 initShop 会重置界面，确保它不会清理掉刚才的解锁提示
-
-    initShop();
-
-
-
-    scoreDisp.style.color = 'var(--neon-green)';
-
-    setTimeout(() => { scoreDisp.style.color = '#fff'; }, 1000);
-
-setTimeout(() => {
-
-        ctrlBtn.style.visibility = 'visible';
-
-        ctrlBtn.disabled = false;
-
-        ctrlBtn.style.opacity = '1';
-
-        ctrlBtn.innerText = "开始游戏"; // 或者你之前的按钮文本
-
-    }, 100);
-
-}
-
-    function updateUI() {
-
-        const hpIndex = 5 - state.hp;
-
-        hpImg.src = `assets/hp${hpIndex}.png`;
-
-        scoreDisp.innerText = `积分: ${Math.floor(state.score)}`;
-
-    }
-
-
-
-function showFloatingText(txt, x, y) {
-
-    const el = document.createElement('div');
-
-    el.className = 'float-text';
-
-    el.innerText = txt;
-
-    // 直接传入窗口中心的 X 坐标
-
-    el.style.left = x + 'px'; 
-
-    el.style.top = y + 'px';
-
-    document.body.appendChild(el);
-
-    setTimeout(() => el.remove(), 1200);
-
-}
-
-function triggerTwoYearCelebration() {
-    state.isGameOver = true;
-    clearInterval(timeLoop);
-    // 清理所有残留地鼠定时器
-    state.moleTimeouts.forEach(clearTimeout);
-    state.moleTimeouts = [];
-    
-    const celebrationDiv = document.createElement('div');
-    celebrationDiv.style.cssText = `
-        position: fixed; inset: 0; 
-        background: rgba(0,0,0,0.95); 
-        display: flex; flex-direction: column;
-        justify-content: center; align-items: center;
-        z-index: 9999; color: gold; font-size: 40px;
-        text-align: center; text-shadow: 0 0 20px #f1c40f;
-        font-weight: bold; font-family: sans-serif;
-    `;
-    
-    celebrationDiv.innerHTML = `
-        <div style="animation: zoomIn 0.8s ease-out;">MARETU同人研学群</div>
-        <div style="margin-top: 20px; animation: zoomIn 1.2s ease-out;">两周年快乐！！(*^▽^*)</div>
-        <button id="restart-btn" onclick="location.reload()" style="margin-top: 40px; padding: 15px 30px; font-size: 20px; cursor: pointer; background: gold; border: none; border-radius: 8px; transition: transform 0.2s;">再玩一次</button>
-    `;
-
-    document.body.appendChild(celebrationDiv);
-    
-    const style = document.createElement('style');
-    style.innerHTML = `
-        @keyframes zoomIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+            const textDiv = document.createElement('div');
+            textDiv.style.cssText = `
+                text-align: center; z-index: 10002;
+                animation: fadeInUp 1s ease-out forwards;
+            `;
+            textDiv.innerHTML = `
+                <div style="font-size: 48px; font-weight: bold; color: gold; letter-spacing: 4px; animation: glowPulse 2s infinite;">
+                    🏆 全成就达成！ 🏆
+                </div>
+                <div style="margin-top: 20px; font-size: 24px; color: #fff; opacity: 0.9; letter-spacing: 2px;">
+                    ${isDevMode ? '（开发者模式）' : '你真的好厉害w(ﾟДﾟ)w！'}
+                </div>
+                <button onclick="document.getElementById('celebration-container').remove()" style="
+                    margin-top: 40px; padding: 12px 40px;
+                    font-size: 20px; font-weight: bold;
+                    background: linear-gradient(135deg, gold, #ffaa00);
+                    color: #1a1a2e; border: none; border-radius: 30px;
+                    cursor: pointer; letter-spacing: 2px;
+                    box-shadow: 0 0 20px rgba(255,215,0,0.5);
+                ">继续</button>
+            `;
+            container.appendChild(textDiv);
+            document.body.appendChild(container);
         }
-        #restart-btn:hover { transform: scale(1.1); }
-        #restart-btn:active { transform: scale(0.95); }
-    `;
-    document.head.appendChild(style);
-}
 
+        function showFloatingText(txt, x, y) {
+            const el = document.createElement('div');
+            el.className = 'float-text';
+            el.innerText = txt;
+            el.style.left = x + 'px'; 
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1200);
+        }
 
+        function triggerTwoYearCelebration() {
+            state.isGameOver = true;
+            clearInterval(timeLoop);
+            state.moleTimeouts.forEach(clearTimeout);
+            state.moleTimeouts = [];
+            const celebrationDiv = document.createElement('div');
+            celebrationDiv.style.cssText = `
+                position: fixed; inset: 0; 
+                background: rgba(0,0,0,0.95); 
+                display: flex; flex-direction: column;
+                justify-content: center; align-items: center;
+                z-index: 9999; color: gold; font-size: 40px;
+                text-align: center; text-shadow: 0 0 20px #f1c40f;
+                font-weight: bold; font-family: sans-serif;
+            `;
+            celebrationDiv.innerHTML = `
+                <div style="animation: zoomIn 0.8s ease-out;">MARETU同人研学群</div>
+                <div style="margin-top: 20px; animation: zoomIn 1.2s ease-out;">两周年快乐！！(*^▽^*)</div>
+                <div style="margin-top: 15px; font-size: 24px; color: #fff;">
+                    通关用时：${state.speedrunTime} 秒
+                </div>
+                <button id="restart-btn" onclick="handleRestart()" style="
+                    margin-top: 30px; padding: 12px 30px; font-size: 22px; background: gold; color: black; border: none; border-radius: 8px; cursor: pointer;">再玩一次</button>
+            `;
+            document.body.appendChild(celebrationDiv);
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes zoomIn {
+                    0% { transform: scale(0.5); opacity: 0; }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+                #restart-btn:hover { transform: scale(1.1); }
+                #restart-btn:active { transform: scale(0.95); }
+            `;
+            document.head.appendChild(style);
+        }
 
-// 修改后的 activateAngel92 函数
+        ctrlBtn.onclick = startGame;
+        initShop();
+        renderAchievements();
+    </script> 
 
-function activateAngel92() {
-
-    // 删掉 !state.isGameOver 的限制，允许在开赛前或赛中预设
-
-    if (state.angel92Unlocked && !state.is92Used) {
-
-        state.is92Used = true;
-
-        state.isAngel92Active = true;
-
-        state.globalMultiplier = 2.0; 
-
-       
-
-        
-
-    }
-
-}
-
-
-
-ctrlBtn.onclick = startGame;
-
-    initShop();
-
-
-
-</script> <svg width="0" height="0" style="position:absolute;">
-
-    <defs>
-
-        <filter id="mushroom-distort">
-
-            <feTurbulence 
-
-                type="turbulence" 
-
-                baseFrequency="0.03" 
-
-                numOctaves="2" 
-
-                seed="1" 
-
-                result="turbulence">
-
-                <animate 
-
-                    attributeName="seed" 
-
-                    from="1" 
-
-                    to="100" 
-
-                    dur="10s" 
-
-                    repeatCount="indefinite" />
-
-            </feTurbulence>
-
-            <feDisplacementMap 
-
-                in="SourceGraphic" 
-
-                in2="turbulence" 
-
-                scale="20" 
-
-                xChannelSelector="R" 
-
-                yChannelSelector="G" />
-
-        </filter>
-
-    </defs>
-
-</svg>
-
-
+    <svg width="0" height="0" style="position:absolute;">
+        <defs>
+            <filter id="mushroom-distort">
+                <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="2" seed="1" result="turbulence">
+                    <animate attributeName="seed" from="1" to="100" dur="10s" repeatCount="indefinite" />
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="20" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
 
 </body>
-
 </html>
