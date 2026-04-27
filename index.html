@@ -363,6 +363,138 @@
             animation: floatUpParticle linear infinite;
         }
 
+/* ========================================================= */
+/* 移动端与平板适配 (宽度小于 900px 的设备生效，不影响 PC 端) */
+/* ========================================================= */
+
+/* 1. 修复所有设备下（包括PC）文字过长导致的商店卡片溢出问题 */
+.shop-item {
+    height: auto !important; 
+    min-height: 100px;
+}
+
+/* 2. 提升移动端点击体验：禁止双击屏幕放大（这对打地鼠游戏极其重要） */
+body {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media screen and (max-width: 900px) {
+    /* 容器改为上下排列 */
+    #main-container {
+        flex-direction: column;
+    }
+
+    /* 游戏区域：占屏幕 60% 高度 */
+    #game-area {
+        flex: 6; 
+        height: 60vh;
+        padding: 45px 10px 10px; /* 顶部留出给音量和计时器的空间 */
+        justify-content: center; /* 居中紧凑排列，防止元素被挤出屏幕 */
+        gap: 10px;
+    }
+
+    /* 商店区域：占屏幕 40% 高度 */
+    #shop-area {
+        flex: 4; 
+        height: 40vh;
+        max-height: 40vh;
+        border-left: none;
+        border-top: 2px solid #2c2c2c; /* 分割线移到顶部 */
+        padding: 10px;
+    }
+
+    /* 地鼠网格：动态计算宽度，防止在小屏幕上高度超出 */
+    #grid {
+        gap: 6px;
+        padding: 10px;
+        width: 100%;
+        /* 关键：限制最大宽度为屏幕高度的 40%，使得网格按比例缩小时永远不会超出屏幕高度 */
+        max-width: min(100%, 40vh); 
+        margin: 0 auto;
+    }
+
+/* UI 位置与缩放调整，避免拥挤 */
+    #volume-control {
+        top: auto !important;   /* 取消顶部定位 */
+        left: auto !important;  /* 取消左侧定位 */
+        bottom: 5px !important; /* 贴紧底部 */
+        right: 5px !important;  /* 贴紧右侧 */
+        padding: 5px 8px !important;
+        transform: scale(0.8);
+        transform-origin: bottom right; /* 从右下角开始缩放 */
+    }
+
+    #speedrun-timer {
+        top: 10px !important;
+        right: 10px !important;
+        font-size: 16px !important;
+    }
+
+    /* 将隐藏的“喵”图标移动到顶部正中，避免挡住底部的开始按钮 */
+    #cat-icon {
+        bottom: auto !important;
+        top: 10px !important;
+        left: 50% !important;
+        transform: translateX(-50%);
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    /* 分数与顶栏的字号缩小 */
+    #score-display {
+        font-size: 22px;
+        margin-top: 0;
+    }
+    
+    #hp-img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .game-btn {
+        padding: 10px 25px;
+        font-size: 16px;
+        margin-top: 5px;
+    }
+
+    /* 商店内容紧凑化调整 */
+    .tab-buttons { margin-bottom: 10px; }
+    .tab-btn { padding: 8px 0; font-size: 14px; }
+    
+    .shop-item {
+        padding: 12px;
+        min-height: 80px;
+    }
+    .item-icon {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+    }
+    .item-name { font-size: 14px; margin-bottom: 2px; }
+    .item-desc { font-size: 11px; }
+    .item-price { font-size: 12px; }
+    .buy-btn { padding: 6px 12px; font-size: 12px; }
+
+    /* 成就项紧凑化 */
+    .ach-item {
+        padding: 10px;
+        min-height: auto;
+    }
+    .ach-claim-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    /* 教程提示框适应小屏幕 */
+    #tutorial-img {
+        max-width: 95%;
+        max-height: 50vh;
+    }
+    #tutorial-overlay h2 { font-size: 24px !important; }
+    #tutorial-overlay p { font-size: 14px !important; }
+}
+
     </style>
 </head>
 <body>
@@ -409,22 +541,20 @@
 
             <div id="grid"></div>
 
-            <button id="ctrl-btn" class="game-btn">开始游戏</button>
+<button id="ctrl-btn" class="game-btn">开始游戏</button>
             <div id="timer-display" style="visibility: hidden;">0s/20s</div>
-        </div>
 
-        <div id="volume-control" style="position: absolute; top: 20px; left: 20px; z-index: 999; background: rgba(0,0,0,0.55); padding: 8px 10px; border-radius: 6px; display: flex; gap: 12px; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 4px;">
-                <label style="color: #aaa; font-size: 11px;">BGM</label>
-                <input type="range" id="bgm-slider" min="0" max="1" step="0.1" value="0.5" style="width: 70px;">
+            <div id="volume-control" style="position: absolute; bottom: 20px; right: 20px; z-index: 999; background: rgba(0,0,0,0.55); padding: 8px 10px; border-radius: 6px; display: flex; gap: 12px; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <label style="color: #aaa; font-size: 11px;">BGM</label>
+                    <input type="range" id="bgm-slider" min="0" max="1" step="0.1" value="0.5" style="width: 70px;">
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <label style="color: #aaa; font-size: 11px;">音效</label>
+                    <input type="range" id="sfx-slider" min="0" max="1" step="0.1" value="0.5" style="width: 70px;">
+                </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 4px;">
-                <label style="color: #aaa; font-size: 11px;">音效</label>
-                <input type="range" id="sfx-slider" min="0" max="1" step="0.1" value="0.5" style="width: 70px;">
-            </div>
-        </div>
-
-        <div id="shop-area">
+        </div> <div id="shop-area">
             <!-- 标签按钮 -->
             <div class="tab-buttons">
                 <button class="tab-btn active" onclick="switchTab('shop')">不明之地</button>
